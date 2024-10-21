@@ -1,12 +1,12 @@
 from flask import Flask
-from .database import db
+from app.database import db
 from flask_jwt_extended import JWTManager
-
+import os
 def create_app():
     app = Flask(__name__)
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/edumanage'
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'mssql+pyodbc://@MSI\\SQLEXPRESS/edumanage?driver=ODBC+Driver+17+for+SQL+Server&Trusted_Connection=yes')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['JWT_SECRET_KEY'] = 'key_is_key'
+    app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'key_is_key')
     jwt = JWTManager(app)
 
     db.init_app(app)

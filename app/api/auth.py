@@ -7,9 +7,10 @@ auth_bp = Blueprint('auth', __name__)
 @auth_bp.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
+    
     username = data.get('username')
     password = data.get('password')
-
+    print(username + ' ' +password)
     token = login_user(username, password)
 
     if token:
@@ -22,22 +23,22 @@ def logout():
     response = jsonify({'message': 'Successfully logged out'})
     return logout_user(response)
 
-# @auth_bp.route('/register', methods=['POST'])
-# def register():
-#     data = request.get_json()
-#     username = data.get('username')
-#     password = data.get('password')
-#     fullname = data.get('fullname')
-#     gmail = data.get('gmail')
-#     phonenumber = data.get('phonenumber')
+@auth_bp.route('/register', methods=['POST'])
+def register():
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+    fullname = data.get('fullname')
+    gmail = data.get('gmail')
+    phonenumber = data.get('phonenumber')
 
-#     # Gọi hàm register_user từ auth_service
-#     new_user = register_user(username, password, fullname, gmail, phonenumber)
+    # Gọi hàm register_user từ auth_service
+    new_user = register_user(username, password, fullname, gmail, phonenumber)
 
-#     if new_user:
-#         return jsonify({'message': 'User registered successfully'}), 201
-#     else:
-#         return jsonify({'message': 'Username already exists'}), 400
+    if new_user:
+        return jsonify({'message': 'User registered successfully'}), 201
+    else:
+        return jsonify({'message': 'Username already exists'}), 400
 
 @auth_bp.route('/user/profile', methods=['GET'])
 @jwt_required()
