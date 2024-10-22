@@ -9,7 +9,7 @@ app = create_app()
 # Cấu hình CORS cho ứng dụng
 CORS(app, resources={r"/api/*": {"origins": "*"}})  # Cho phép tất cả các nguồn, có thể chỉ định các nguồn cụ thể nếu cần
 
-# Tạo một đối tượng Migrate cho ứng dụng
+
 
 
 if __name__ == "__main__":
