@@ -1,13 +1,13 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
-from flask_migrate import Migrate
+
 import os
 
 # Khởi tạo các đối tượng toàn cục
 db = SQLAlchemy()
 jwt = JWTManager()
-migrate = Migrate()
+
 
 def create_app():
     app = Flask(__name__)
@@ -18,7 +18,7 @@ def create_app():
     # Khởi tạo các phần mở rộng
     db.init_app(app)
     jwt.init_app(app)
-    migrate.init_app(app, db)
+   
 
     with app.app_context():
         # Import blueprints
