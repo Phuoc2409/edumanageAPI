@@ -1,2 +1,4 @@
 unixodbc
+https://packages.microsoft.com/keys/microsoft.asc
+https://packages.microsoft.com/config/ubuntu/20.04/prod.list
 msodbcsql17
