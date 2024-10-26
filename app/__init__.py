@@ -1,17 +1,29 @@
 from flask import Flask
-from app.database import db
+from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
+from app.database import db
 import os
+
+# Khởi tạo các đối tượng toàn cục
+
+jwt = JWTManager()
+
+
 def create_app():
     app = Flask(__name__)
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'mssql+pyodbc://@MSI\\SQLEXPRESS/edumanage?driver=ODBC+Driver+17+for+SQL+Server&Trusted_Connection=yes')
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(
+    'DATABASE_URL',
+    'mysql+pymysql://root:123456@18.136.100.139/edumanage')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'key_is_key')
-    jwt = JWTManager(app)
 
+    # Khởi tạo các phần mở rộng
     db.init_app(app)
+    jwt.init_app(app)
+   
 
     with app.app_context():
+        # Import blueprints
         from .api.users import users_bp
         from .api.auth import auth_bp
         from .api.asset import assets_bp
@@ -22,11 +34,12 @@ def create_app():
         from .api.category import categories_bp
         from .api.requirement import requirements_bp
         from .api.requirement_detail import requirement_details_bp
+
         api_prefix = '/api'
 
         blueprints = [
             (auth_bp, 'auth'),
-            (users_bp, ''),  
+            (users_bp, ''),
             (assets_bp, ''),
             (asset_details_bp, ''),
             (asset_features_bp, ''),
@@ -40,6 +53,5 @@ def create_app():
         # Đăng ký các blueprint với prefix chung
         for bp, path in blueprints:
             app.register_blueprint(bp, url_prefix=f'{api_prefix}/{path}' if path else api_prefix)
-
 
     return app
