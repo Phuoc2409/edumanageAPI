@@ -49,3 +49,7 @@ def user_profile():
         return jsonify({'username': user.username, 'email': user.gmail}), 200
     else:
         return jsonify({'message': 'User not found'}), 404
+@auth_bp.route('/test', methods=['GET'])
+@jwt_required()
+def user_profile():
+        return jsonify({'message': 'testing '}), 404

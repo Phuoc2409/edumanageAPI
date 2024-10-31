@@ -7,7 +7,7 @@ class AssetFeature(db.Model):
     id = db.Column(db.Integer, primary_key=True)  # Khóa chính
     asset_feature_name = db.Column(db.Text, nullable=False)  # Tên đặc điểm tài sản
     description = db.Column(db.Text, nullable=False)  # Mô tả đặc điểm
-
+    
     def to_dict(self):
         return {
             "id": self.id,
