@@ -13,6 +13,11 @@ class AssetDetail(db.Model):
     last_maintenance_date = db.Column(db.Date, nullable=False)  # Ngày bảo trì cuối
     status = db.Column(db.Text, nullable=False)  # Trạng thái tài sản
 
+    # Khóa ngoại đến bảng `assets` và `categories`
+    asset_id = db.Column(db.Integer, db.ForeignKey('assets.id'), nullable=False)  # Khóa ngoại đến bảng assets
+
+    asset = db.relationship('Asset', backref='asset_details')
+
     def to_dict(self):
         return {
             "id": self.id,
@@ -23,4 +28,6 @@ class AssetDetail(db.Model):
             "used_years": self.used_years,
             "last_maintenance_date": str(self.last_maintenance_date),
             "status": self.status,
+            "asset_id": self.asset_id,
+            "category_id": self.asset.category_id if self.asset else None,  # Kiểm tra trước khi lấy category_id
         }

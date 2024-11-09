@@ -1,4 +1,5 @@
 from app.models.asset_detail import AssetDetail
+from app.models.asset import Asset
 from app.database import db
 
 def create_asset_detail(asset_detail_data):
@@ -42,3 +43,42 @@ def delete_asset_detail(asset_detail_id):
         db.session.commit()
         return True
     return False
+
+def search_asset_details(filters):
+    # Bắt đầu truy vấn từ bảng AssetDetail và kết hợp với bảng Asset
+    query = db.session.query(AssetDetail).join(Asset)
+
+    # Áp dụng các bộ lọc dựa trên các giá trị đầu vào
+    if "identifier_number" in filters:
+        query = query.filter(AssetDetail.identifier_number == filters["identifier_number"])
+    if "user_id" in filters:
+        query = query.filter(AssetDetail.user_id == filters["user_id"])
+
+    # Tìm kiếm theo khoảng ngày tháng
+    if "start_date" in filters and "end_date" in filters:
+        query = query.filter(AssetDetail.purchase_date.between(filters["start_date"], filters["end_date"]))
+    elif "start_date" in filters:
+        query = query.filter(AssetDetail.purchase_date >= filters["start_date"])
+    elif "end_date" in filters:
+        query = query.filter(AssetDetail.purchase_date <= filters["end_date"])
+
+    # Tìm kiếm theo khoảng giá cả
+    if "min_price" in filters and "max_price" in filters:
+        query = query.filter(AssetDetail.purchase_price.between(filters["min_price"], filters["max_price"]))
+    elif "min_price" in filters:
+        query = query.filter(AssetDetail.purchase_price >= filters["min_price"])
+    elif "max_price" in filters:
+        query = query.filter(AssetDetail.purchase_price <= filters["max_price"])
+
+    if "status" in filters:
+        query = query.filter(AssetDetail.status == filters["status"])
+
+    # Tìm kiếm theo category_id từ bảng Asset
+    if "category_id" in filters:
+        query = query.filter(Asset.category_id == filters["category_id"])
+
+    # Tìm kiếm theo asset_id từ bảng AssetDetail
+    if "asset_id" in filters:
+        query = query.filter(AssetDetail.asset_id == filters["asset_id"])
+
+    return [asset_detail.to_dict() for asset_detail in query.all()]
