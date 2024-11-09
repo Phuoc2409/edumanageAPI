@@ -1,22 +1,36 @@
 from flask import Blueprint, request, jsonify
 from app.services.auth_service import login_user, logout_user, get_current_user, register_user
 from flask_jwt_extended import jwt_required
+from app.models.user import User  # Lấy model người dùng từ database
+from app.services.auth_service import generate_tokens  # Chúng ta sẽ gọi hàm này để tạo token
+from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_token
 
 auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
-    
+
     username = data.get('username')
     password = data.get('password')
-    print(username + ' ' +password)
-    token = login_user(username, password)
-
-    if token:
-        return jsonify(access_token=token), 200
+    
+    # Kiểm tra username và password từ database
+    user = User.query.filter_by(username=username).first()
+    if user and user.check_password(password):  # Kiểm tra mật khẩu người dùng
+        # Tạo access_token và refresh_token
+        access_token, refresh_token = generate_tokens(user.id)
+        
+        # Trả về cả access_token và refresh_token
+        return jsonify(access_token=access_token, refresh_token=refresh_token), 200
     else:
         return jsonify({'message': 'Invalid username or password'}), 401
+    
+@auth_bp.route('/refresh', methods=['POST'])
+@jwt_required(refresh=True)  # Yêu cầu người dùng phải cung cấp refresh_token
+def refresh():
+    current_user = get_jwt_identity()  # Lấy user_id từ refresh_token
+    new_access_token = create_access_token(identity=current_user)  # Tạo access_token mới
+    return jsonify(access_token=new_access_token), 200
 
 @auth_bp.route('/logout', methods=['POST'])
 def logout():
@@ -49,7 +63,3 @@ def user_profile():
         return jsonify({'username': user.username, 'email': user.gmail}), 200
     else:
         return jsonify({'message': 'User not found'}), 404
-@auth_bp.route('/test', methods=['GET'])
-@jwt_required()
-def user_profile():
-        return jsonify({'message': 'testing '}), 404

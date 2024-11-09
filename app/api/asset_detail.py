@@ -58,3 +58,30 @@ def delete_asset_detail_api(asset_detail_id):
     if delete_asset_detail(asset_detail_id):
         return jsonify({"message": "Asset detail deleted successfully"}), 204
     return jsonify({"error": "Asset detail not found"}), 404
+
+
+#Lọc chi tiết tài sản
+from app.services.asset_detail_service import search_asset_details
+@asset_details_bp.route("/asset_details/search", methods=["GET"])
+@jwt_required()
+def search_asset_details_route():
+    # Lấy các tham số tìm kiếm từ request
+    filters = {
+        "identifier_number": request.args.get("identifier_number"),
+        "user_id": request.args.get("user_id"),
+        "start_date": request.args.get("start_date"),  # Ngày bắt đầu
+        "end_date": request.args.get("end_date"),      # Ngày kết thúc
+        "min_price": request.args.get("min_price"),    # Giá tối thiểu
+        "max_price": request.args.get("max_price"),    # Giá tối đa
+        "status": request.args.get("status"),
+        "category_id": request.args.get("category_id"),
+        "asset_id": request.args.get("asset_id"),
+    }
+    
+    # Loại bỏ các tham số không có giá trị
+    filters = {key: value for key, value in filters.items() if value is not None}
+
+    # Thực hiện tìm kiếm
+    asset_details = search_asset_details(filters)
+    
+    return jsonify(asset_details), 200

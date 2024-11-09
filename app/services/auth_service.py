@@ -1,15 +1,17 @@
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import create_access_token,create_refresh_token, jwt_required, get_jwt_identity
 from app.models.user import User
 from werkzeug.security import check_password_hash, generate_password_hash
 from app.database import db
+from datetime import timedelta
 
-def login_user(username, password):
-    user = User.query.filter_by(username=username).first()
-    if user and check_password_hash(user.password, password):
-        # Tạo token cho người dùng
-        access_token = create_access_token(identity=user.id)
-        return access_token
-    return None
+def generate_tokens(user_id):
+    # Tạo access_token với thời gian sống ngắn (15 phút)
+    access_token = create_access_token(identity=user_id, expires_delta=timedelta(minutes=15))
+
+    # Tạo refresh_token với thời gian sống lâu hơn (30 ngày)
+    refresh_token = create_refresh_token(identity=user_id, expires_delta=timedelta(days=30))
+
+    return access_token, refresh_token
 
 @jwt_required()
 def logout_user(response):
