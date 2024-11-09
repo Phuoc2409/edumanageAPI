@@ -42,15 +42,21 @@ def create_app():
     db.init_app(app)
     jwt.init_app(app)
    
-    firebase_credentials = get_firebase_credentials()
-    cred = credentials.Certificate(firebase_credentials)
-    initialize_app(cred, {
-        'databaseURL': 'https://edumange-fdfeb-default-rtdb.firebaseio.com/' 
+
+    cred = credentials.Certificate("D:\Download\edumage-realtime-db-key.json")
+    firebase_admin.initialize_app(cred, {
+        'databaseURL': 'https://edumange-fdfeb-default-rtdb.firebaseio.com/'
     })
-    firebase_realtime_db = firebase_db.reference()  # Tham chiếu gốc tới Realtime Database
+    firebase_realtime_db = firebase_db.reference()
+    # firebase_credentials = get_firebase_credentials()
+    # cred = credentials.Certificate(firebase_credentials)
+    # initialize_app(cred, {
+    #     'databaseURL': 'https://edumange-fdfeb-default-rtdb.firebaseio.com/' 
+    # })
+    # firebase_realtime_db = firebase_db.reference()  # Tham chiếu gốc tới Realtime Database
 
 
-    # cred = credentials.Certificate("D:\Download\edumage-realtime-db-key.json")  # Thay path/to/your-firebase-adminsdk.json bằng đường dẫn thật của file JSON
+    # cred = credentials.Certificate("/etc/secrets/edumage-realtime-db-key.json")  # Thay path/to/your-firebase-adminsdk.json bằng đường dẫn thật của file JSON
     # firebase_admin.initialize_app(cred)
 
     # firebase_db = firebase_admin.db.reference()  # Khởi tạo với URL của Database
@@ -69,6 +75,7 @@ def create_app():
         from .api.category import categories_bp
         from .api.requirement import requirements_bp
         from .api.requirement_detail import requirement_details_bp
+        from .api.firebase import firebase_bp
 
         api_prefix = '/api'
 
@@ -83,6 +90,7 @@ def create_app():
             (categories_bp, ''),
             (requirements_bp, ''),
             (requirement_details_bp, ''),
+            (firebase_bp,'')
         ]
 
         # Đăng ký các blueprint với prefix chung

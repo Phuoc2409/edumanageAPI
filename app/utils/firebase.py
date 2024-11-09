@@ -11,5 +11,5 @@ def initialize_firebase():
     # Khởi tạo Firestore
     db = firestore.client()
     
-    # Bạn có thể thực hiện các thao tác với Firestore hoặc Authentication ở đây
+        # Bạn có thể thực hiện các thao tác với Firestore hoặc Authentication ở đây
     return db

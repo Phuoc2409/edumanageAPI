@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from app.services.auth_service import login_user, logout_user, get_current_user, register_user
+from app.services.auth_service import  logout_user, get_current_user, register_user
 from flask_jwt_extended import jwt_required
 from app.models.user import User  # Lấy model người dùng từ database
 from app.services.auth_service import generate_tokens  # Chúng ta sẽ gọi hàm này để tạo token
