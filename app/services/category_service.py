@@ -40,3 +40,30 @@ def delete_category(category_id):
         db.session.commit()
         return True
     return False
+
+def filter_all_categories(page=1, per_page=10, min_lifespan=None, max_lifespan=None, 
+                       name=None, description=None, default_salvage_value_rate=None, parent_id=None):
+    query = Category.query
+
+    # Áp dụng bộ lọc
+    if min_lifespan is not None:
+        query = query.filter(Category.min_lifespan >= min_lifespan)
+    if max_lifespan is not None:
+        query = query.filter(Category.max_lifespan <= max_lifespan)
+    if name:
+        query = query.filter(Category.name.ilike(f"%{name}%"))
+    if default_salvage_value_rate is not None:
+        query = query.filter(Category.default_salvage_value_rate == default_salvage_value_rate)
+    if parent_id is not None:
+        query = query.filter(Category.parent_id == parent_id)
+    # Phân trang
+    paginated_categories = query.paginate(page=page, per_page=per_page, error_out=False)
+    categories = [category.to_dict() for category in paginated_categories.items]
+
+    return {
+        "categories": categories,
+        "total": paginated_categories.total,
+        "page": paginated_categories.page,
+        "per_page": paginated_categories.per_page,
+        "pages": paginated_categories.pages
+    }
