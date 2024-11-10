@@ -1,9 +1,10 @@
 from flask import Blueprint, request, jsonify
-from app.services.auth_service import login_user, logout_user, get_current_user, register_user
+from app.services.auth_service import  logout_user, get_current_user, register_user
 from flask_jwt_extended import jwt_required
 from app.models.user import User  # Lấy model người dùng từ database
 from app.services.auth_service import generate_tokens  # Chúng ta sẽ gọi hàm này để tạo token
 from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_token
+from werkzeug.security import check_password_hash
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -16,7 +17,7 @@ def login():
     
     # Kiểm tra username và password từ database
     user = User.query.filter_by(username=username).first()
-    if user and user.check_password(password):  # Kiểm tra mật khẩu người dùng
+    if user and check_password_hash(user.password, password):
         # Tạo access_token và refresh_token
         access_token, refresh_token = generate_tokens(user.id)
         
