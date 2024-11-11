@@ -4,7 +4,8 @@ from flask_jwt_extended import jwt_required
 from app.models.user import User  # Lấy model người dùng từ database
 from app.services.auth_service import generate_tokens  # Chúng ta sẽ gọi hàm này để tạo token
 from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_token
-
+from werkzeug.security import check_password_hash
+from app.utils.permisions import get_user_permissions
 auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/login', methods=['POST'])
@@ -16,7 +17,7 @@ def login():
     
     # Kiểm tra username và password từ database
     user = User.query.filter_by(username=username).first()
-    if user and user.check_password(password):  # Kiểm tra mật khẩu người dùng
+    if user and check_password_hash(user.password, password):
         # Tạo access_token và refresh_token
         access_token, refresh_token = generate_tokens(user.id)
         
@@ -63,3 +64,12 @@ def user_profile():
         return jsonify({'username': user.username, 'email': user.gmail}), 200
     else:
         return jsonify({'message': 'User not found'}), 404
+
+@auth_bp.route('user/permissions',methods=['GET'])
+@jwt_required()
+def user_persmissions():
+    current_user_id = get_jwt_identity()  
+    permissions = get_user_permissions(current_user_id)
+    return jsonify({"permissions": permissions})
+
+

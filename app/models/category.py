@@ -12,6 +12,8 @@ class Category(db.Model):
     default_salvage_value_rate = db.Column(db.Float, nullable=False)  # Tỷ lệ giá trị thanh lý mặc định
     parent_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=True)  # Khóa ngoại đến bảng categories
 
+    assets = db.relationship("Asset", back_populates="category")
+
     def to_dict(self):
         return {
             "id": self.id,

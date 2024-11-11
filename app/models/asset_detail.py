@@ -6,6 +6,7 @@ class AssetDetail(db.Model):
     # Các thuộc tính của model
     id = db.Column(db.Integer, primary_key=True)  # Khóa chính
     identifier_number = db.Column(db.Text, nullable=False)  # Số hiệu tài sản
+    asset_id = db.Column(db.Integer, db.ForeignKey('assets.id'), nullable=False)
     user_id = db.Column(db.Integer, nullable=False)  # ID người dùng
     purchase_date = db.Column(db.Date, nullable=False)  # Ngày mua
     purchase_price = db.Column(db.Float, nullable=False)  # Giá mua
@@ -13,10 +14,8 @@ class AssetDetail(db.Model):
     last_maintenance_date = db.Column(db.Date, nullable=False)  # Ngày bảo trì cuối
     status = db.Column(db.Text, nullable=False)  # Trạng thái tài sản
 
-    # Khóa ngoại đến bảng `assets` và `categories`
-    asset_id = db.Column(db.Integer, db.ForeignKey('assets.id'), nullable=False)  # Khóa ngoại đến bảng assets
 
-    asset = db.relationship('Asset', backref='asset_details')
+    asset = db.relationship("Asset", back_populates="asset_details")
 
     def to_dict(self):
         return {
@@ -29,5 +28,9 @@ class AssetDetail(db.Model):
             "last_maintenance_date": str(self.last_maintenance_date),
             "status": self.status,
             "asset_id": self.asset_id,
-            "category_id": self.asset.category_id if self.asset else None,  # Kiểm tra trước khi lấy category_id
+            "asset": {
+                "id": self.asset.id,
+                "name": self.asset.asset_name,
+                "description": self.asset.description
+            } if self.asset else None        
         }

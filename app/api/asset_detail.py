@@ -15,7 +15,7 @@ asset_details_bp = Blueprint("asset_details", __name__)
 # Tạo chi tiết tài sản mới
 @asset_details_bp.route("/asset-details", methods=["POST"])
 @jwt_required()
-@permission_required('asset-detail-add')
+@permission_required('asset-details-add')
 def add_asset_detail():
     asset_detail_data = request.get_json()
     asset_detail = create_asset_detail(asset_detail_data)
@@ -24,7 +24,7 @@ def add_asset_detail():
 # Lấy tất cả chi tiết tài sản
 @asset_details_bp.route("/asset-details", methods=["GET"])
 @jwt_required()
-@permission_required('asset-detail-index')
+@permission_required('asset-details-index')
 def read_asset_details():
     asset_details = get_all_asset_details()
     return jsonify(asset_details), 200
@@ -32,7 +32,7 @@ def read_asset_details():
 # Lấy chi tiết tài sản theo ID
 @asset_details_bp.route("/asset-details/<int:asset_detail_id>", methods=["GET"])
 @jwt_required()
-@permission_required('asset-detail-index')
+@permission_required('asset-details-index')
 def read_asset_detail(asset_detail_id):
     asset_detail = get_asset_detail_by_id(asset_detail_id)
     if asset_detail is None:
@@ -42,7 +42,7 @@ def read_asset_detail(asset_detail_id):
 # Cập nhật chi tiết tài sản
 @asset_details_bp.route("/asset-details/<int:asset_detail_id>", methods=["PUT"])
 @jwt_required()
-@permission_required('asset-detail-edit')
+@permission_required('asset-details-edit')
 def update_asset_detail_api(asset_detail_id):
     asset_detail_data = request.get_json()
     updated_asset_detail = update_asset_detail(asset_detail_id, asset_detail_data)
@@ -53,7 +53,7 @@ def update_asset_detail_api(asset_detail_id):
 # Xóa chi tiết tài sản
 @asset_details_bp.route("/asset-details/<int:asset_detail_id>", methods=["DELETE"])
 @jwt_required()
-@permission_required('asset-detail-delete')
+@permission_required('asset-details-delete')
 def delete_asset_detail_api(asset_detail_id):
     if delete_asset_detail(asset_detail_id):
         return jsonify({"message": "Asset detail deleted successfully"}), 204
@@ -64,6 +64,7 @@ def delete_asset_detail_api(asset_detail_id):
 from app.services.asset_detail_service import search_asset_details
 @asset_details_bp.route("/asset_details/search", methods=["GET"])
 @jwt_required()
+@permission_required('asset-details-index')
 def search_asset_details_route():
     # Lấy các tham số tìm kiếm từ request
     filters = {

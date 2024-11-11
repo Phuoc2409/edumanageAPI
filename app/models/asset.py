@@ -9,10 +9,16 @@ class Asset(db.Model):
     description = db.Column(db.Text, nullable=False)  # Mô tả tài sản
     category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=False)  # Khóa ngoại đến bảng categories
 
+    asset_details = db.relationship("AssetDetail", back_populates="asset")
+    category = db.relationship("Category", back_populates="assets")
+
     def to_dict(self):
         return {
             "id": self.id,
             "asset_name": self.asset_name,
             "description": self.description,
-            "category_id": self.category_id,
+             "category": {
+                "id": self.category.id,
+                "name": self.category.name
+            } if self.category else None
         }
