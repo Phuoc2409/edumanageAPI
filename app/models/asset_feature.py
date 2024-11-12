@@ -5,12 +5,14 @@ class AssetFeature(db.Model):
 
     # Các thuộc tính của model
     id = db.Column(db.Integer, primary_key=True)  # Khóa chính
-    asset_feature_name = db.Column(db.Text, nullable=False)  # Tên đặc điểm tài sản
+    asset_detail_id = db.Column(db.Integer, nullable=False) 
+    feature_id = db.Column(db.Integer, nullable=False)  # Tên đặc điểm tài sản
     description = db.Column(db.Text, nullable=False)  # Mô tả đặc điểm
     
     def to_dict(self):
         return {
             "id": self.id,
-            "asset_feature_name": self.asset_feature_name,
+            "asset_detail_id": self.asset_detail_id,
+            "feature_id":self.feature_id,
             "description": self.description,
         }
