@@ -82,3 +82,34 @@ def search_asset_details(filters):
         query = query.filter(AssetDetail.asset_id == filters["asset_id"])
 
     return [asset_detail.to_dict() for asset_detail in query.all()]
+def get_all_asset_detail(asset_detail_id):
+        # Tìm AssetDetail theo ID
+        asset_detail = AssetDetail.query.get_or_404(asset_detail_id)
+
+        # Lấy danh sách đặc trưng liên quan
+        features = [
+            {
+                "feature_id": af.feature.id,
+                "feature_description": af.feature.description,
+                "feature_type": af.feature.feature_type.name if af.feature.feature_type else None,
+                "asset_feature_description": af.description
+            }
+            for af in asset_detail.features
+        ]
+
+        # Tạo dictionary chứa dữ liệu chi tiết
+        data = {
+            "id": asset_detail.id,
+            "asset": asset_detail.asset.to_dict() if asset_detail.asset else None,
+            "identifier_number": asset_detail.identifier_number,
+            "user": asset_detail.user.to_dict() if asset_detail.user else None,
+            "purchase_date": asset_detail.purchase_date,
+            "purchase_price": asset_detail.purchase_price,
+            "used_years": asset_detail.used_years,
+            "last_maintenance_date": asset_detail.last_maintenance_date,
+            "parent": asset_detail.parent.to_dict() if asset_detail.parent else None,
+            "status": asset_detail.status,
+            "features": features
+        }
+
+        return data

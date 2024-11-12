@@ -5,6 +5,7 @@ from app.services.asset_detail_service import (
     get_all_asset_details,
     update_asset_detail,
     delete_asset_detail,
+    get_all_asset_detail,
 )
 from app.utils.permisions import permission_required
 from flask_jwt_extended import jwt_required
@@ -86,3 +87,12 @@ def search_asset_details_route():
     asset_details = search_asset_details(filters)
     
     return jsonify(asset_details), 200
+@asset_details_bp.route("/asset_details_all/<int:asset_detail_id>", methods=["GET"])
+@jwt_required()
+@permission_required('asset-details-index')
+def get_asset_detail(asset_detail_id):
+    # Gọi hàm từ AssetDetailService để lấy dữ liệu chi tiết
+    asset_detail_data = get_all_asset_detail(asset_detail_id)
+    
+    # Trả về dữ liệu dưới dạng JSON
+    return jsonify(asset_detail_data)

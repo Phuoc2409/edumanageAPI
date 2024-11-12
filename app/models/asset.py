@@ -1,24 +1,21 @@
 from ..database import db
 
 class Asset(db.Model):
-    __tablename__ = 'assets'  # Tên bảng trong cơ sở dữ liệu
+    __tablename__ = 'assets'
 
-    # Các thuộc tính của model
-    id = db.Column(db.Integer, primary_key=True)  # Khóa chính
-    asset_name = db.Column(db.Text, nullable=False)  # Tên tài sản
-    description = db.Column(db.Text, nullable=False)  # Mô tả tài sản
-    category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=False)  # Khóa ngoại đến bảng categories
-
-    asset_details = db.relationship("AssetDetail", back_populates="asset")
-    category = db.relationship("Category", back_populates="assets")
+    id = db.Column(db.Integer, primary_key=True)
+    asset_name = db.Column(db.Text, nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    
+    category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=False)
+    category = db.relationship('Category', backref='assets', lazy=True)
 
     def to_dict(self):
         return {
             "id": self.id,
             "asset_name": self.asset_name,
             "description": self.description,
-             "category": {
-                "id": self.category.id,
-                "name": self.category.name
-            } if self.category else None
+            "category": self.category.name if self.category else None
         }
+
+

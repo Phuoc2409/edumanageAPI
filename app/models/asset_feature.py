@@ -1,18 +1,21 @@
 from ..database import db
 
 class AssetFeature(db.Model):
-    __tablename__ = 'asset_features'  # Tên bảng trong cơ sở dữ liệu
+    __tablename__ = 'asset_features'
 
-    # Các thuộc tính của model
-    id = db.Column(db.Integer, primary_key=True)  # Khóa chính
-    asset_detail_id = db.Column(db.Integer, nullable=False) 
-    feature_id = db.Column(db.Integer, nullable=False)  # Tên đặc điểm tài sản
-    description = db.Column(db.Text, nullable=False)  # Mô tả đặc điểm
-    
+    id = db.Column(db.Integer, primary_key=True)
+    asset_detail_id = db.Column(db.Integer, db.ForeignKey('asset_details.id'), nullable=False)
+    feature_id = db.Column(db.Integer, db.ForeignKey('features.id'), nullable=False)
+    description = db.Column(db.Text, nullable=True)
+
+    asset_detail = db.relationship('AssetDetail', backref='features', lazy=True)
+    feature = db.relationship('Feature', backref='asset_features', lazy=True)
+
     def to_dict(self):
         return {
             "id": self.id,
             "asset_detail_id": self.asset_detail_id,
-            "feature_id":self.feature_id,
-            "description": self.description,
+            "feature": self.feature.name if self.feature else None,
+            "description": self.description
         }
+

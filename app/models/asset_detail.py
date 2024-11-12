@@ -1,37 +1,33 @@
 from ..database import db
 
 class AssetDetail(db.Model):
-    __tablename__ = 'asset_details'  # Tên bảng trong cơ sở dữ liệu
+    __tablename__ = 'asset_details'
 
-    # Các thuộc tính của model
-    id = db.Column(db.Integer, primary_key=True)  # Khóa chính
+    id = db.Column(db.Integer, primary_key=True)
     asset_id = db.Column(db.Integer, db.ForeignKey('assets.id'), nullable=False)
-    identifier_number = db.Column(db.Text, nullable=False)  # Số hiệu tài sản
-    user_id = db.Column(db.Integer, nullable=False)  # ID người dùng
-    purchase_date = db.Column(db.Date, nullable=False)  # Ngày mua
-    purchase_price = db.Column(db.Float, nullable=False)  # Giá mua
-    used_years = db.Column(db.Integer, nullable=False)  # Số năm đã sử dụng
-    last_maintenance_date = db.Column(db.Date, nullable=False)  # Ngày bảo trì cuối
-    parent_id = db.Column(db.Integer, nullable=False) 
-    status = db.Column(db.Text, nullable=False)  # Trạng thái tài sản
+    identifier_number = db.Column(db.Integer, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    purchase_date = db.Column(db.Date, nullable=False)
+    purchase_price = db.Column(db.Float, nullable=False)
+    used_years = db.Column(db.Integer, nullable=False)
+    last_maintenance_date = db.Column(db.Date, nullable=True)
+    parent_id = db.Column(db.Integer, db.ForeignKey('asset_details.id'), nullable=True)
+    status = db.Column(db.Enum('available', 'in_use', 'under_maintenance', 'disposed'), nullable=False)
 
-    asset = db.relationship("Asset", back_populates="asset_details")
+    asset = db.relationship('Asset', backref='asset_details', lazy=True)
+    user = db.relationship('User', backref='asset_details', lazy=True)
+    parent = db.relationship('AssetDetail', remote_side=[id], backref='children', lazy=True)
 
     def to_dict(self):
         return {
             "id": self.id,
+            "asset": self.asset.asset_name if self.asset else None,
             "identifier_number": self.identifier_number,
-            "user_id": self.user_id,
-            "purchase_date": str(self.purchase_date),
+            "user": self.user.fullname if self.user else None,
+            "purchase_date": self.purchase_date,
             "purchase_price": self.purchase_price,
             "used_years": self.used_years,
-            "last_maintenance_date": str(self.last_maintenance_date),
-            "status": self.status,
-            "asset_id": self.asset_id,
-            "parent_id":self.asset_id,
-            "asset": {
-                "id": self.asset.id,
-                "name": self.asset.asset_name,
-                "description": self.asset.description
-            } if self.asset else None        
+            "last_maintenance_date": self.last_maintenance_date,
+            "parent_id": self.parent_id,
+            "status": self.status
         }
