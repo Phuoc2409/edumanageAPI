@@ -3,7 +3,7 @@ from firebase_admin import credentials, auth, firestore
 
 def initialize_firebase():
     # Đọc file JSON cấu hình
-    cred = credentials.Certificate("path/to/your/firebase-private-key.json")
+    cred = credentials.Certificate("D:\Download\edumage-realtime-db-key.json")
     
     # Khởi tạo Firebase Admin SDK
     firebase_admin.initialize_app(cred)

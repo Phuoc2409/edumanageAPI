@@ -1,6 +1,7 @@
 from app.models.asset_detail import AssetDetail
 from app.models.asset import Asset
 from app.database import db
+import re
 
 def create_asset_detail(asset_detail_data):
     asset_detail = AssetDetail(
@@ -113,3 +114,58 @@ def get_all_asset_detail(asset_detail_id):
         }
 
         return data
+def get_asset_details_by_room(parent_asset_detail_id):
+    asset_details = AssetDetail.query.filter_by(parent_id=parent_asset_detail_id).all()
+
+    result = []
+    for asset_detail in asset_details:
+        # Thêm thông tin cơ bản của asset_detail vào danh sách kết quả
+        result.append({
+            "id": asset_detail.id,
+            "identifier_number": asset_detail.identifier_number,
+            "status": asset_detail.status,
+            "purchase_date": asset_detail.purchase_date,
+        })
+
+    return result
+
+def get_all_buildings():
+        """
+        Lấy danh sách tất cả các tòa nhà có identifier_number định dạng đúng (1 chữ cái + 1 số).
+        """
+        # Truy vấn tất cả các `identifier_number` trong AssetDetail mà không gọi lại hàm này
+        buildings = db.session.query(AssetDetail.identifier_number).distinct()
+        
+        # Lọc ra các tòa nhà có định dạng đúng
+        building_names = {str(asset.identifier_number)[-2:] for asset in buildings if re.match(r'[A-Z]\d$', str(asset.identifier_number)[-2:])}
+        return list(building_names)
+
+def get_floors_by_building(building):
+        """
+        Lấy danh sách các tầng trong một tòa nhà cụ thể.
+        """
+        # Kiểm tra định dạng của tòa nhà
+        if not re.match(r'^[A-Z]\d$', building):
+            return []
+
+        # Truy vấn tất cả các tầng thuộc tòa nhà được chỉ định
+        floors = db.session.query(AssetDetail).filter(
+            AssetDetail.identifier_number.like(f"%{building}")
+        ).all()
+
+        # Trích số tầng từ `identifier_number` (giả sử tầng là ký tự đầu tiên hoặc hai ký tự đầu tiên)
+        floor_numbers = {str(asset.identifier_number)[:1] for asset in floors}
+        return sorted(list(floor_numbers))
+
+def get_rooms_by_floor_and_building(building, floor):
+        # Kiểm tra định dạng tòa nhà
+        if not re.match(r'^[A-Z]\d$', building):
+            return []
+
+        floor_prefix = str(floor)
+        rooms = db.session.query(AssetDetail).filter(
+            AssetDetail.identifier_number.like(f"{floor_prefix}%{building}")
+        ).all()
+
+        room_numbers = [asset.identifier_number for asset in rooms]
+        return room_numbers
