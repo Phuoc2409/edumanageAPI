@@ -5,6 +5,7 @@ from app.services.category_service import (
     get_all_categories,
     update_category,
     delete_category,
+    get_all_buildings
 )
 from app.utils.permisions import permission_required
 from flask_jwt_extended import jwt_required
@@ -58,3 +59,9 @@ def delete_category_api(category_id):
     if delete_category(category_id):
         return jsonify({"message": "Category deleted successfully"}), 204
     return jsonify({"error": "Category not found"}), 404
+
+
+@categories_bp.route("/buildings", methods=["GET"])
+def get_buildings():
+    buildings = get_all_buildings()
+    return jsonify({"buildings": buildings})

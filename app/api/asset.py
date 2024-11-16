@@ -5,6 +5,7 @@ from app.services.asset_service import (
     get_all_assets,
     update_asset,
     delete_asset,
+    get_floors_by_building
 )
 from app.utils.permisions import permission_required
 from flask_jwt_extended import jwt_required
@@ -58,3 +59,10 @@ def delete_asset_api(asset_id):
     if delete_asset(asset_id):
         return jsonify({"message": "Asset deleted successfully"}), 204
     return jsonify({"error": "Asset not found"}), 404
+
+@assets_bp.route("/floors/<int:building_id>", methods=["GET"])
+def get_floors(building_id):
+    floors = get_floors_by_building(building_id)
+    if not floors:
+        return jsonify({"error": "Building not found"}), 404
+    return jsonify({"building_id": building_id, "floors": floors})

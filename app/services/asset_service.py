@@ -1,4 +1,5 @@
 from app.models.asset import Asset
+from app.models.category import Category
 from app.database import db
 
 def create_asset(asset_data):
@@ -34,3 +35,14 @@ def delete_asset(asset_id):
         db.session.commit()
         return True
     return False
+def get_floors_by_building(building_id):
+        # Lấy các tầng của một tòa nhà từ bảng Asset
+        building = Category.query.get(building_id)
+        if not building:
+            return None  # Nếu không tìm thấy tòa nhà
+
+        floors = Asset.query.filter_by(category_id=building_id).all()
+        return [
+            {"id": floor.id, "asset_name": floor.asset_name, "description": floor.description}
+            for floor in floors
+        ]

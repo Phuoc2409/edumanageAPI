@@ -6,11 +6,7 @@ from app.services.asset_detail_service import (
     update_asset_detail,
     delete_asset_detail,
     get_all_asset_detail,
-    get_asset_details_by_room,
-    get_floors_by_building,
-    get_all_buildings,
-    get_asset_details_by_room,
-    get_rooms_by_floor_and_building,
+   get_rooms_by_floor,
 )
 from app.utils.permisions import permission_required
 from flask_jwt_extended import jwt_required
@@ -68,9 +64,7 @@ def delete_asset_detail_api(asset_detail_id):
 
 #Lọc chi tiết tài sản
 from app.services.asset_detail_service import search_asset_details
-@asset_details_bp.route("/asset_details/search", methods=["GET"])
-@jwt_required()
-@permission_required('asset-details-index')
+@asset_details_bp.route("/asset_details/filter", methods=["POST"])
 def search_asset_details_route():
     # Lấy các tham số tìm kiếm từ request
     filters = {
@@ -102,33 +96,6 @@ def get_asset_detail(asset_detail_id):
     # Trả về dữ liệu dưới dạng JSON
     return jsonify(asset_detail_data)
 
-@asset_details_bp.route("/asset_details/room/<int:parent_asset_detail_id>", methods=["GET"])
-# @jwt_required()
-# @permission_required('asset-details-index')
-def get_asset_details_in_room(parent_asset_detail_id):
-    # Gọi hàm từ AssetDetailService để lấy dữ liệu chi tiết
-    asset_detail_data = get_asset_details_by_room(parent_asset_detail_id)
-    
-    # Trả về dữ liệu dưới dạng JSON
-    return jsonify(asset_detail_data),200
-
-@asset_details_bp.route('/buildings', methods=['GET'])
-# @jwt_required()
-# @permission_required('asset-details-index')
-def get_buildings():
-    buildings = get_all_buildings()
-    return jsonify(buildings), 200
-
-@asset_details_bp.route('/floors/<string:building>', methods=['GET'])
-# @jwt_required()
-# @permission_required('asset-details-index')
-def get_floors(building):
-    floors = get_floors_by_building(building)
-    return jsonify(floors),200
-
-@asset_details_bp.route('/rooms/<string:building>/<int:floor>', methods=['GET'])
-# @jwt_required()
-# @permission_required('asset-details-index')
-def get_rooms(building, floor):
-    rooms = get_rooms_by_floor_and_building(building, floor)
-    return jsonify( rooms),200
+@asset_details_bp.route('/rooms/<int:floor_id>', methods=['GET'])
+def rooms(floor_id):
+    return jsonify(get_rooms_by_floor(floor_id))
