@@ -4,6 +4,7 @@ from app.models.category import Category
 from app.database import db
 import re
 from datetime import datetime
+from sqlalchemy import and_
 
 
 def create_asset_detail(asset_detail_data):
@@ -48,75 +49,101 @@ def delete_asset_detail(asset_detail_id):
         return True
     return False
 
-def search_asset_details(filters):
-    # Bắt đầu truy vấn từ bảng AssetDetail và kết hợp với bảng Asset
-    query = db.session.query(AssetDetail).join(Asset)
+def filter_asset_details(filters):
+    # Bắt đầu query
+    query = AssetDetail.query
 
-    # Áp dụng các bộ lọc dựa trên các giá trị đầu vào
-    if "identifier_number" in filters:
-        query = query.filter(AssetDetail.identifier_number == filters["identifier_number"])
-    if "user_id" in filters:
-        query = query.filter(AssetDetail.user_id == filters["user_id"])
+    # Duyệt qua tất cả các trường trong filters và thêm điều kiện vào query
+    for key, value in filters.items():
+        if hasattr(AssetDetail, key) and value is not None:
+            # Nếu giá trị là chuỗi, sử dụng LIKE để hỗ trợ tìm kiếm
+            if isinstance(value, str):
+                query = query.filter(getattr(AssetDetail, key).like(f"%{value}%"))
+            else:
+                # Các trường khác áp dụng bộ lọc chính xác
+                query = query.filter(getattr(AssetDetail, key) == value)
 
-    # Tìm kiếm theo khoảng ngày tháng
-    if "start_date" in filters and "end_date" in filters:
-        query = query.filter(AssetDetail.purchase_date.between(filters["start_date"], filters["end_date"]))
-    elif "start_date" in filters:
-        query = query.filter(AssetDetail.purchase_date >= filters["start_date"])
-    elif "end_date" in filters:
-        query = query.filter(AssetDetail.purchase_date <= filters["end_date"])
-
-    # Tìm kiếm theo khoảng giá cả
-    if "min_price" in filters and "max_price" in filters:
-        query = query.filter(AssetDetail.purchase_price.between(filters["min_price"], filters["max_price"]))
-    elif "min_price" in filters:
-        query = query.filter(AssetDetail.purchase_price >= filters["min_price"])
-    elif "max_price" in filters:
-        query = query.filter(AssetDetail.purchase_price <= filters["max_price"])
-
-    if "status" in filters:
-        query = query.filter(AssetDetail.status == filters["status"])
-
-    # Tìm kiếm theo category_id từ bảng Asset
-    if "category_id" in filters:
-        query = query.filter(Asset.category_id == filters["category_id"])
-
-    # Tìm kiếm theo asset_id từ bảng AssetDetail
-    if "asset_id" in filters:
-        query = query.filter(AssetDetail.asset_id == filters["asset_id"])
-
+    # Thực thi query và trả về tất cả thông tin của AssetDetail
     return [asset_detail.to_dict() for asset_detail in query.all()]
-def get_all_asset_detail(asset_detail_id):
-        # Tìm AssetDetail theo ID
-        asset_detail = AssetDetail.query.get_or_404(asset_detail_id)
 
-        # Lấy danh sách đặc trưng liên quan
-        features = [
-            {
-                "feature_id": af.feature.id,
-                "feature_description": af.feature.description,
-                "feature_type": af.feature.feature_type.name if af.feature.feature_type else None,
-                "asset_feature_description": af.description
-            }
-            for af in asset_detail.features
-        ]
+from sqlalchemy.orm import joinedload
 
-        # Tạo dictionary chứa dữ liệu chi tiết
-        data = {
-            "id": asset_detail.id,
-            "asset": asset_detail.asset.to_dict() if asset_detail.asset else None,
-            "identifier_number": asset_detail.identifier_number,
-            "user": asset_detail.user.to_dict() if asset_detail.user else None,
-            "purchase_date": asset_detail.purchase_date,
-            "purchase_price": asset_detail.purchase_price,
-            "used_years": asset_detail.used_years,
-            "last_maintenance_date": asset_detail.last_maintenance_date,
-            "parent": asset_detail.parent.to_dict() if asset_detail.parent else None,
-            "status": asset_detail.status,
-            "features": features
+def filter_asset_details_by_room_floor_building(filters):
+   # Các tham số lọc
+    room_number = filters.get("room_number")
+    floor_id = filters.get("floor_id")
+    building_id = filters.get("building_id")
+
+    # Bắt đầu query chính
+    query = db.session.query(AssetDetail)
+
+    # Lọc theo mã phòng
+    if room_number:
+        # Tìm asset_detail đại diện cho phòng với mã room_number
+        room_asset_detail = db.session.query(AssetDetail.id).filter_by(identifier_number=room_number).first()
+        if not room_asset_detail:
+            raise Exception(f"No asset detail found with room_number = {room_number}")
+
+        query = query.filter(AssetDetail.parent_id == room_asset_detail.id)
+
+    # Lọc theo tầng
+    if floor_id:
+        # Tìm các phòng thuộc tầng
+        subquery_rooms = (
+            db.session.query(AssetDetail.id)
+            .filter(AssetDetail.asset_id == floor_id)
+            .subquery()
+        )
+        query = query.filter(AssetDetail.parent_id.in_(subquery_rooms))
+
+    # Lọc theo tòa nhà
+    if building_id:
+        # Tìm các tầng thuộc tòa nhà
+        subquery_floors = (
+            db.session.query(Asset.id)
+            .filter(Asset.category_id == building_id)
+            .subquery()
+        )
+        # Tìm các phòng thuộc các tầng trong tòa nhà
+        subquery_rooms = (
+            db.session.query(AssetDetail.id)
+            .filter(AssetDetail.asset_id.in_(subquery_floors))
+            .subquery()
+        )
+        query = query.filter(AssetDetail.parent_id.in_(subquery_rooms))
+
+    # Thực thi query và trả về kết quả
+    filtered_results = query.all()
+    return [
+        {
+            "id": detail.id,
+            "identifier_number": detail.identifier_number,
+            "parent_id": detail.parent_id,
+            "status": detail.status,
+            "purchase_date": detail.purchase_date,
+            "last_maintenance_date": detail.last_maintenance_date,
         }
+        for detail in filtered_results
+    ]
 
-        return data
+def filter_by_floor_and_room(filters):
+    # Lấy các tham số lọc từ body request
+    floor_id = filters.get("floor_id")
+    room_number = filters.get("room_number")
+
+    # Bắt đầu query
+    query = AssetDetail.query
+
+    # Lọc theo floor_id (ID tầng)
+    if floor_id:
+        query = query.filter_by(parent_id=floor_id)
+
+    # Lọc theo room_number (số phòng)
+    if room_number:
+        query = query.filter_by(identifier_number=room_number)
+
+    # Trả về kết quả
+    return [asset_detail.to_dict() for asset_detail in query.all()]
 
 def get_rooms_by_floor(floor_id):
     rooms = AssetDetail.query.filter_by(asset_id=floor_id).all()

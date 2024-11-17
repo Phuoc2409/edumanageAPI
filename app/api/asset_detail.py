@@ -5,8 +5,9 @@ from app.services.asset_detail_service import (
     get_all_asset_details,
     update_asset_detail,
     delete_asset_detail,
-    get_all_asset_detail,
-   get_rooms_by_floor,
+    get_rooms_by_floor,
+    filter_asset_details,
+    filter_asset_details_by_room_floor_building
 )
 from app.utils.permisions import permission_required
 from flask_jwt_extended import jwt_required
@@ -61,40 +62,35 @@ def delete_asset_detail_api(asset_detail_id):
         return jsonify({"message": "Asset detail deleted successfully"}), 204
     return jsonify({"error": "Asset detail not found"}), 404
 
+@asset_details_bp.route('/asset-details/filter-by-building-floor-room', methods=['POST'])
+def filter_by_floor_and_room_api():
+    try:
+        # Lấy dữ liệu từ body request
+        filters = request.get_json()
 
+        # Gọi service lọc theo ID tầng và phòng
+        filtered_results = filter_asset_details_by_room_floor_building(filters)
+
+        # Trả về kết quả
+        return jsonify(filtered_results), 200
+    except Exception as e:
+        return jsonify({"error": f"Error filtering asset details: {str(e)}"}), 500
+    
 #Lọc chi tiết tài sản
-from app.services.asset_detail_service import search_asset_details
-@asset_details_bp.route("/asset_details/filter", methods=["POST"])
-def search_asset_details_route():
-    # Lấy các tham số tìm kiếm từ request
-    filters = {
-        "identifier_number": request.args.get("identifier_number"),
-        "user_id": request.args.get("user_id"),
-        "start_date": request.args.get("start_date"),  # Ngày bắt đầu
-        "end_date": request.args.get("end_date"),      # Ngày kết thúc
-        "min_price": request.args.get("min_price"),    # Giá tối thiểu
-        "max_price": request.args.get("max_price"),    # Giá tối đa
-        "status": request.args.get("status"),
-        "category_id": request.args.get("category_id"),
-        "asset_id": request.args.get("asset_id"),
-    }
-    
-    # Loại bỏ các tham số không có giá trị
-    filters = {key: value for key, value in filters.items() if value is not None}
+@asset_details_bp.route('/asset-details/filter', methods=['POST'])
+def get_filter_asset_details():
+    try:
+        # Lấy dữ liệu từ request body
+        filters = request.get_json()
 
-    # Thực hiện tìm kiếm
-    asset_details = search_asset_details(filters)
+        # Gọi service với dữ liệu body
+        filtered_results = filter_asset_details(filters)
+
+        # Trả về kết quả
+        return jsonify(filtered_results), 200
+    except Exception as e:
+        return jsonify({"error": f"Error filtering asset details: {str(e)}"}), 500
     
-    return jsonify(asset_details), 200
-@asset_details_bp.route("/asset_details_all/<int:asset_detail_id>", methods=["GET"])
-@jwt_required()
-@permission_required('asset-details-index')
-def get_asset_detail(asset_detail_id):
-    # Gọi hàm từ AssetDetailService để lấy dữ liệu chi tiết
-    asset_detail_data = get_all_asset_detail(asset_detail_id)
-    
-    # Trả về dữ liệu dưới dạng JSON
-    return jsonify(asset_detail_data)
 
 @asset_details_bp.route('/rooms/<int:floor_id>', methods=['GET'])
 def rooms(floor_id):
