@@ -65,4 +65,4 @@ def get_floors(building_id):
     floors = get_floors_by_building(building_id)
     if not floors:
         return jsonify({"error": "Building not found"}), 404
-    return jsonify({"building_id": building_id, "floors": floors})
+    return jsonify(floors), 200

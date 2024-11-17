@@ -117,6 +117,7 @@ def filter_asset_details_by_room_floor_building(filters):
     return [
         {
             "id": detail.id,
+            "asset_name": detail.asset.asset_name,
             "identifier_number": detail.identifier_number,
             "parent_id": detail.parent_id,
             "status": detail.status,
