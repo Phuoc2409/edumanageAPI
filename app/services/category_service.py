@@ -41,15 +41,9 @@ def delete_category(category_id):
         return True
     return False
 def get_all_buildings():
-    buildings = Category.query.filter_by(parent_id=0).all()
-    return [
-        {
-            "id": building.id,
-            "name": building.name,
-            "description": building.description,
-            "min_lifespan": building.min_lifespan,
-            "max_lifespan": building.max_lifespan,
-            "default_salvage_value_rate": building.default_salvage_value_rate
-        }
-        for building in buildings
-    ]
+        # Lấy tất cả các tòa nhà từ bảng Category
+        buildings = Category.query.all()
+        return [
+            {"id": building.id, "name": building.name, "description": building.description}
+            for building in buildings
+        ]

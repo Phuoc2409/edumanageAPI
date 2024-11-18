@@ -46,3 +46,21 @@ def get_floors_by_building(building_id):
             {"id": floor.id, "asset_name": floor.asset_name, "description": floor.description}
             for floor in floors
         ]
+def filter_assets(filters):
+    """
+    Lọc và tìm kiếm trên bảng Asset dựa theo các trường và giá trị trong filters.
+    """
+    query = Asset.query
+
+    # Duyệt qua tất cả các trường trong filters và thêm điều kiện vào query
+    for key, value in filters.items():
+        if hasattr(Asset, key) and value is not None:
+            # Nếu giá trị là chuỗi, sử dụng LIKE để hỗ trợ tìm kiếm
+            if isinstance(value, str):
+                query = query.filter(getattr(Asset, key).like(f"%{value}%"))
+            else:
+                # Các trường khác áp dụng bộ lọc chính xác
+                query = query.filter(getattr(Asset, key) == value)
+
+    # Thực thi query và trả về tất cả thông tin của Asset
+    return [asset.to_dict() for asset in query.all()]
