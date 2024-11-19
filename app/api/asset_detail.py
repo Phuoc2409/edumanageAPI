@@ -7,7 +7,8 @@ from app.services.asset_detail_service import (
     delete_asset_detail,
     get_rooms_by_floor,
     filter_asset_details,
-    filter_asset_details_by_room_floor_building
+    filter_asset_details_by_room_floor_building,
+    get_features_by_asset_detail_id
 )
 from app.utils.permisions import permission_required
 from flask_jwt_extended import jwt_required
@@ -95,3 +96,13 @@ def get_filter_asset_details():
 @asset_details_bp.route('/rooms/<int:floor_id>', methods=['GET'])
 def rooms(floor_id):
     return jsonify(get_rooms_by_floor(floor_id))
+
+@asset_details_bp.route('/assets/<int:asset_detail_id>/features', methods=['GET'])
+def get_features(asset_detail_id):
+    # Gọi dịch vụ để lấy dữ liệu các tính năng của AssetDetail
+    features_data = get_features_by_asset_detail_id(asset_detail_id)
+    
+    if not features_data:
+        return jsonify({"error": "AssetDetail not found"}), 404
+    
+    return jsonify(features_data)

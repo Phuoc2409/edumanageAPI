@@ -6,10 +6,10 @@ from datetime import timedelta
 
 def generate_tokens(user_id):
     # Tạo access_token với thời gian sống ngắn (15 phút)
-    access_token = create_access_token(identity=user_id, expires_delta=timedelta(minutes=15))
+    access_token = create_access_token(identity=str(user_id), expires_delta=timedelta(minutes=15))
 
     # Tạo refresh_token với thời gian sống lâu hơn (30 ngày)
-    refresh_token = create_refresh_token(identity=user_id, expires_delta=timedelta(days=30))
+    refresh_token = create_refresh_token(identity=str(user_id), expires_delta=timedelta(days=30))
 
     return access_token, refresh_token
 

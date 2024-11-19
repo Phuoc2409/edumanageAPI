@@ -35,7 +35,7 @@ def create_app():
     'DATABASE_URL',
     'mysql+pymysql://root:@localhost/edumanage')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'key_is_key')
+    app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'key_is_key_really_256bit_long_example_here')
     app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(minutes=15)  # Thời gian sống của access token
     app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(days=30) 
     # Khởi tạo các phần mở rộng

@@ -1,5 +1,9 @@
 from app.models.asset_detail import AssetDetail
 from app.models.asset import Asset
+from app.models.asset_feature import AssetFeature
+from app.models.feature import Feature
+from app.models.feature_type import FeatureType
+from app.models.asset import Asset
 from app.models.category import Category
 from app.database import db
 import re
@@ -160,3 +164,24 @@ def get_rooms_by_floor(floor_id):
         }
         for room in rooms
     ]
+def get_features_by_asset_detail_id(asset_detail_id):
+    # Truy vấn các tính năng liên quan đến AssetDetail thông qua bảng AssetFeature
+    asset_detail = db.session.query(AssetDetail).join(AssetFeature).join(Feature).join(FeatureType).filter(AssetDetail.id == asset_detail_id).first()
+
+    if not asset_detail:
+        return None
+
+    # Lấy thông tin các tính năng của asset_detail
+    features = []
+    for asset_feature in asset_detail.features:
+        features.append({
+            "feature_description": asset_feature.feature.description if asset_feature.feature else None,
+            "feature_type": asset_feature.feature.feature_type.name if asset_feature.feature and asset_feature.feature.feature_type else None,
+            "feature_type_description": asset_feature.feature.feature_type.description if asset_feature.feature and asset_feature.feature.feature_type else None,
+            "value": asset_feature.description  # Mô tả của tính năng liên kết với AssetDetail
+        })
+    
+    return {
+        "asset_detail_id": asset_detail.id,
+        "features": features
+    }
