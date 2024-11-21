@@ -75,6 +75,8 @@ def create_app():
         from .api.category import categories_bp
         from .api.requirement import requirements_bp
         from .api.requirement_detail import requirement_details_bp
+        from .api.permission import permission_bp
+        from .api.role import role_bp
         from .api.firebase import firebase_bp
 
         api_prefix = '/api'
@@ -90,6 +92,8 @@ def create_app():
             (categories_bp, ''),
             (requirements_bp, ''),
             (requirement_details_bp, ''),
+            (permission_bp, ''),
+            (role_bp, ''),
             (firebase_bp,'')
         ]
 

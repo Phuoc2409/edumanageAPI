@@ -1,40 +1,65 @@
-from app.models.requirement import Requirement
-from app.database import db
+from ..database import db
+from ..models.requirement import Requirement
 
-def create_requirement(requirement_data):
-    requirement = Requirement(
-        user_id=requirement_data['user_id'],
-        requester_identifier=requirement_data['requester_identifier'],
-        date=requirement_data['date'],
-        description=requirement_data['description'],
-        status=requirement_data['status']
+
+def create_requirement(data):
+    """
+    Tạo yêu cầu mới.
+    """
+    new_requirement = Requirement(
+        user_id=data.get("user_id"),
+        date=data.get("date"),
+        description=data.get("description"),
+        status=data.get("status")
     )
-    db.session.add(requirement)
+    db.session.add(new_requirement)
     db.session.commit()
-    return requirement.to_dict()
+    return new_requirement.to_dict()
 
-def get_requirement_by_id(requirement_id):
-    return Requirement.query.get(requirement_id).to_dict() if Requirement.query.get(requirement_id) else None
 
 def get_all_requirements():
-    return [requirement.to_dict() for requirement in Requirement.query.all()]
+    """
+    Lấy danh sách tất cả các yêu cầu.
+    """
+    requirements = Requirement.query.all()
+    return [req.to_dict() for req in requirements]
 
-def update_requirement(requirement_id, requirement_data):
+
+def get_requirement_by_id(requirement_id):
+    """
+    Lấy thông tin yêu cầu theo ID.
+    """
     requirement = Requirement.query.get(requirement_id)
     if requirement:
-        requirement.user_id = requirement_data.get('user_id', requirement.user_id)
-        requirement.requester_identifier = requirement_data.get('requester_identifier', requirement.requester_identifier)
-        requirement.date = requirement_data.get('date', requirement.date)
-        requirement.description = requirement_data.get('description', requirement.description)
-        requirement.status = requirement_data.get('status', requirement.status)
-        db.session.commit()
         return requirement.to_dict()
     return None
 
-def delete_requirement(requirement_id):
+
+def update_requirement(requirement_id, data):
+    """
+    Cập nhật thông tin yêu cầu.
+    """
     requirement = Requirement.query.get(requirement_id)
-    if requirement:
-        db.session.delete(requirement)
-        db.session.commit()
-        return True
-    return False
+    if not requirement:
+        return None
+
+    requirement.user_id = data.get("user_id", requirement.user_id)
+    requirement.date = data.get("date", requirement.date)
+    requirement.description = data.get("description", requirement.description)
+    requirement.status = data.get("status", requirement.status)
+
+    db.session.commit()
+    return requirement.to_dict()
+
+
+def delete_requirement(requirement_id):
+    """
+    Xóa một yêu cầu.
+    """
+    requirement = Requirement.query.get(requirement_id)
+    if not requirement:
+        return False
+
+    db.session.delete(requirement)
+    db.session.commit()
+    return True
