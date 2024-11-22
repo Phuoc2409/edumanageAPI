@@ -67,6 +67,7 @@ def update_user(user_id, data):
     user.phonenumber = data.get("phonenumber", user.phonenumber)
     user.username = data.get("username", user.username)
     user.password = data.get("password", user.password)
+    user.deleted_at = data.get("deleted_at", user.deleted_at)
 
     db.session.commit()
     return user.to_dict()
