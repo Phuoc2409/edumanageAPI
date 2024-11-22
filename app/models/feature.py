@@ -14,5 +14,6 @@ class Feature(db.Model):
         return {
             "id": self.id,
             "description": self.description,
-            "feature_type": self.feature_type.name
+            "feature_type": self.feature_type.name,
+            "deleted_at":self.deleted_at
         }

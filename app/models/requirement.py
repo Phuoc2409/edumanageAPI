@@ -18,4 +18,5 @@ class Requirement(db.Model):
             "date": self.date.isoformat(),
             "description": self.description,
             "status": self.status,
+            "deleted_at":self.deleted_at
         }

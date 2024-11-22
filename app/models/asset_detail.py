@@ -29,5 +29,7 @@ class AssetDetail(db.Model):
             "used_years": self.used_years,
             "last_maintenance_date": self.last_maintenance_date,
             "parent_id": self.parent_id,
-            "status": self.status
+            "status": self.status,
+            "deleted_at":self.deleted_at
+
         }

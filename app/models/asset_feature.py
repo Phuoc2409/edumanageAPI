@@ -17,6 +17,7 @@ class AssetFeature(db.Model):
             "id": self.id,
             "asset_detail_id": self.asset_detail_id,
             "feature": self.feature.name if self.feature else None,
-            "description": self.description
+            "description": self.description,
+            "deleted_at":self.deleted_at
         }
 

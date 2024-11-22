@@ -43,7 +43,7 @@ def get_floors_by_building(building_id):
 
         floors = Asset.query.filter_by(category_id=building_id).all()
         return [
-            {"id": floor.id, "asset_name": floor.asset_name, "description": floor.description}
+            {"id": floor.id, "asset_name": floor.asset_name, "description": floor.description,"deleted_at":floor.deleted_at}
             for floor in floors
         ]
 def filter_assets(filters):

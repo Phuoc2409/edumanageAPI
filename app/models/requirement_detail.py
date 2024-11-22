@@ -16,4 +16,5 @@ class RequirementDetail(db.Model):
             "asset_detail_id": self.asset_detail_id,
             "requirement_type": self.requirement_type,
             "description": self.description,
+            "deleted_at":self.deleted_at
         }

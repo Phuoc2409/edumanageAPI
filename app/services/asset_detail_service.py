@@ -160,7 +160,8 @@ def get_rooms_by_floor(floor_id):
             "purchase_price": room.purchase_price,
             "used_years": room.used_years,
             "last_maintenance_date": room.last_maintenance_date.strftime('%Y-%m-%d') if isinstance(room.last_maintenance_date, datetime) else room.last_maintenance_date,
-            "status": room.status
+            "status": room.status,
+            "deleted_at":room.deleted_at
         }
         for room in rooms
     ]

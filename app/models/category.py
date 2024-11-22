@@ -22,5 +22,6 @@ class Category(db.Model):
             "min_lifespan": self.min_lifespan,
             "max_lifespan": self.max_lifespan,
             "default_salvage_value_rate": self.default_salvage_value_rate,
-            "parent_id": self.parent_id
+            "parent_id": self.parent_id,
+            "deleted_at":self.deleted_at
         }

@@ -16,7 +16,8 @@ class Asset(db.Model):
             "id": self.id,
             "asset_name": self.asset_name,
             "description": self.description,
-            "category": self.category.name if self.category else None
+            "category": self.category.name if self.category else None,
+            "deleted_at":self.deleted_at
         }
 
 

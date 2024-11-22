@@ -12,5 +12,6 @@ class FeatureType(db.Model):
         return {
             "id": self.id,
             "name": self.name,
-            "description": self.description
+            "description": self.description,
+            "deleted_at":self.deleted_at
         }
