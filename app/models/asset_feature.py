@@ -10,6 +10,7 @@ class AssetFeature(db.Model):
 
     asset_detail = db.relationship('AssetDetail', backref='features', lazy=True)
     feature = db.relationship('Feature', backref='asset_features', lazy=True)
+    deleted_at = db.Column(db.Date)
 
     def to_dict(self):
         return {

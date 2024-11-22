@@ -12,6 +12,7 @@ class Category(db.Model):
     parent_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=True)
 
     parent = db.relationship('Category', remote_side=[id], backref='subcategories', lazy=True)
+    deleted_at = db.Column(db.Date)
 
     def to_dict(self):
         return {

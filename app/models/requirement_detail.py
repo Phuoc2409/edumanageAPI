@@ -8,6 +8,7 @@ class RequirementDetail(db.Model):
     asset_detail_id = db.Column(db.Integer, nullable=False)  # ID chi tiết tài sản
     requirement_type = db.Column(db.String(50), nullable=False)  # Loại yêu cầu
     description = db.Column(db.Text, nullable=False)  # Mô tả chi tiết yêu cầu
+    deleted_at = db.Column(db.Date)
 
     def to_dict(self):
         return {

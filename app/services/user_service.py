@@ -1,22 +1,39 @@
 from ..database import db
 from ..models.user import User
-
+from ..models.role import Role
+from ..models.user_role import UserRole
 
 def create_user(data):
     """
-    Tạo người dùng mới.
+    Tạo người dùng mới và thêm vai trò cho họ.
     """
+    # Tạo người dùng mới
     new_user = User(
         fullname=data.get("fullname"),
         gmail=data.get("gmail"),
         phonenumber=data.get("phonenumber"),
         username=data.get("username"),
-        password=data.get("password")
+        password=data.get("password")   
     )
     db.session.add(new_user)
-    db.session.commit()
-    return new_user.to_dict()
+    db.session.flush()  # Đảm bảo new_user.id được gán sau khi thêm vào session
 
+    # Thêm vai trò vào bảng user_role
+    roles = data.get("roles", [])  # Lấy danh sách role_id từ request, mặc định là danh sách rỗng
+    for role_id in roles:
+        role = Role.query.get(role_id)
+        if not role:
+            continue  # Bỏ qua nếu role_id không tồn tại
+
+        user_role = UserRole(user_id=new_user.id, role_id=role_id)
+        db.session.add(user_role)
+
+    db.session.commit()
+
+    return {
+        "user": new_user.to_dict(),
+        "roles": [role.to_dict() for role in Role.query.filter(Role.id.in_(roles)).all()]
+    }
 
 def get_all_users():
     """

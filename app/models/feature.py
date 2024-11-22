@@ -8,6 +8,7 @@ class Feature(db.Model):
     
     feature_type_id = db.Column(db.Integer, db.ForeignKey('feature_types.id'), nullable=False)
     feature_type = db.relationship('FeatureType', backref='features', lazy=True)
+    deleted_at = db.Column(db.Date)
 
     def to_dict(self):
         return {

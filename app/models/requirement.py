@@ -9,6 +9,7 @@ class Requirement(db.Model):
     date = db.Column(db.DateTime, nullable=False)  # Ngày yêu cầu
     description = db.Column(db.Text, nullable=False)  # Mô tả yêu cầu
     status = db.Column(db.String(50), nullable=False)  # Trạng thái yêu cầu
+    deleted_at = db.Column(db.Date)
 
     def to_dict(self):
         return {

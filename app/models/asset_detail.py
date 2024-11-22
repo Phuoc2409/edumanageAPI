@@ -13,7 +13,7 @@ class AssetDetail(db.Model):
     last_maintenance_date = db.Column(db.Date, nullable=True)
     parent_id = db.Column(db.Integer, db.ForeignKey('asset_details.id'), nullable=True)
     status = db.Column(db.Enum('available', 'in_use', 'under_maintenance', 'disposed'), nullable=False)
-
+    deleted_at = db.Column(db.Date)
     asset = db.relationship('Asset', backref='asset_details', lazy=True)
     user = db.relationship('User', backref='asset_details', lazy=True)
     parent = db.relationship('AssetDetail', remote_side=[id], backref='children', lazy=True)
