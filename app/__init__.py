@@ -17,7 +17,7 @@ def create_app():
         'mysql+pymysql://root:123456@18.142.186.91/edumanage'
     )
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'key_is_key')
+    app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'key_is_key_really_256bit_long_example_here')
     app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(minutes=15)
     app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(days=30)
 
@@ -47,6 +47,8 @@ def create_app():
         from .api.requirement import requirements_bp
         from .api.requirement_detail import requirement_details_bp
         from .api.firebase import firebase_bp
+        from .api.permission import permission_bp
+        from .api.role import role_bp
 
         api_prefix = '/api'
         blueprints = [
@@ -60,6 +62,8 @@ def create_app():
             (categories_bp, ''),
             (requirements_bp, ''),
             (requirement_details_bp, ''),
+            (permission_bp, ''),
+            (role_bp, ''),
             (firebase_bp,''),
         ]
 

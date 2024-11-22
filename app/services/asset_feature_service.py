@@ -4,7 +4,9 @@ from app.database import db
 def create_asset_feature(asset_feature_data):
     asset_feature = AssetFeature(
         asset_feature_name=asset_feature_data['asset_feature_name'],
-        description=asset_feature_data['description']
+        description=asset_feature_data['description'],
+        asset_detail_id=asset_feature_data['asset_detail_id'],
+        feature_id=asset_feature_data['feature_id'],
     )
     db.session.add(asset_feature)
     db.session.commit()
@@ -21,6 +23,8 @@ def update_asset_feature(asset_feature_id, asset_feature_data):
     if asset_feature:
         asset_feature.asset_feature_name = asset_feature_data.get('asset_feature_name', asset_feature.asset_feature_name)
         asset_feature.description = asset_feature_data.get('description', asset_feature.description)
+        asset_feature.description = asset_feature_data.get('asset_detail_id', asset_feature.asset_detail_id)
+        asset_feature.description = asset_feature_data.get('feature_id', asset_feature.feature_id)
         db.session.commit()
         return asset_feature.to_dict()
     return None

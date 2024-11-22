@@ -9,9 +9,11 @@ class Role(db.Model):
     description = db.Column(db.Text, nullable=False)  # Mô tả vai trò
 
 
+
     def to_dict(self):
         return {
             "id": self.id,
             "role_name": self.role_name,
             "description": self.description,
+        
         }

@@ -5,7 +5,8 @@ from app.services.category_service import (
     filter_all_categories,
     update_category,
     delete_category,
-    get_all_categories
+    get_all_categories,
+    get_all_buildings
    
 )
 from app.utils.permisions import permission_required
@@ -24,12 +25,12 @@ def add_category():
     return jsonify(category), 201
 
 # Lấy tất cả danh mục
-# @categories_bp.route("/categories", methods=["GET"])
-# @jwt_required()
-# @permission_required('category-index')
-# def read_categories():
-#     categories = get_all_categories()
-#     return jsonify(categories), 200
+@categories_bp.route("/categories", methods=["GET"])
+@jwt_required()
+@permission_required('category-index')
+def read_categories():
+    categories = get_all_categories()
+    return jsonify(categories), 200
 
 # Lấy danh mục theo ID
 @categories_bp.route("/categories/<int:category_id>", methods=["GET"])
@@ -61,29 +62,23 @@ def delete_category_api(category_id):
         return jsonify({"message": "Category deleted successfully"}), 204
     return jsonify({"error": "Category not found"}), 404
 
-# Lấy tất cả danh mục hoặc phân trang và lọc
-@categories_bp.route("/categories", methods=["GET"])
+@categories_bp.route("/categories/filter", methods=["POST"])
 @jwt_required()
 @permission_required('category-index')
-def manage_categories():
-    # Lấy các tham số từ query để áp dụng bộ lọc và phân trang
-    page = request.args.get('page', default=1, type=int)
-    per_page = request.args.get('per_page', default=10, type=int)
-    min_lifespan = request.args.get('min_lifespan', type=int, default=None)
-    max_lifespan = request.args.get('max_lifespan', type=int, default=None)
-    name = request.args.get('name', type=str, default=None)
-    default_salvage_value_rate = request.args.get('default_salvage_value_rate', type=float, default=None)
-    parent_id = request.args.get('parent_id', type=int, default=None)
-
-    # Gọi hàm filter_all_categories với các tham số
-    result = filter_all_categories(
-        page=page, 
-        per_page=per_page, 
-        min_lifespan=min_lifespan, 
-        max_lifespan=max_lifespan,
-        name=name,
-        default_salvage_value_rate=default_salvage_value_rate,
-        parent_id=parent_id
+def filter_categories():
+    filters = request.get_json()
+    categories = filter_all_categories(
+        min_lifespan=filters.get("min_lifespan"),
+        max_lifespan=filters.get("max_lifespan"),
+        name=filters.get("name"),
+        description=filters.get("description"),
+        default_salvage_value_rate=filters.get("default_salvage_value_rate"),
+        parent_id=filters.get("parent_id"),
+        
     )
+    return jsonify(categories), 200
 
-    return jsonify(result), 200
+@categories_bp.route("/buildings", methods=["GET"])
+def get_buildings():
+    buildings = get_all_buildings()
+    return jsonify({"buildings": buildings})
