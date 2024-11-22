@@ -2,6 +2,7 @@ from ..database import db
 from ..models.user import User
 from ..models.role import Role
 from ..models.user_role import UserRole
+from werkzeug.security import  generate_password_hash
 
 def create_user(data):
     """
@@ -13,7 +14,7 @@ def create_user(data):
         gmail=data.get("gmail"),
         phonenumber=data.get("phonenumber"),
         username=data.get("username"),
-        password=data.get("password")   
+        password=generate_password_hash(data.get("password")),  # Mã hóa mật khẩu
     )
     db.session.add(new_user)
     db.session.flush()  # Đảm bảo new_user.id được gán sau khi thêm vào session

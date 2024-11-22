@@ -15,8 +15,10 @@ def create_asset_detail(asset_detail_data):
     asset_detail = AssetDetail(
         identifier_number=asset_detail_data['identifier_number'],
         user_id=asset_detail_data['user_id'],
+        asset_id=asset_detail_data['asset_id'],
+        parent_id=asset_detail_data['parent_id'],
         purchase_date=asset_detail_data['purchase_date'],
-        purchase_price=asset_detail_data['purchase_price'],
+        purchase_price=asset_detail_data['purchase_price'], 
         used_years=asset_detail_data['used_years'],
         last_maintenance_date=asset_detail_data['last_maintenance_date'],
         status=asset_detail_data['status']
@@ -36,11 +38,14 @@ def update_asset_detail(asset_detail_id, asset_detail_data):
     if asset_detail:
         asset_detail.identifier_number = asset_detail_data.get('identifier_number', asset_detail.identifier_number)
         asset_detail.user_id = asset_detail_data.get('user_id', asset_detail.user_id)
+        asset_detail.asset_id = asset_detail_data.get('asset_id', asset_detail.asset_id)
+        asset_detail.parent_id = asset_detail_data.get('parent_id', asset_detail.parent_id)
         asset_detail.purchase_date = asset_detail_data.get('purchase_date', asset_detail.purchase_date)
         asset_detail.purchase_price = asset_detail_data.get('purchase_price', asset_detail.purchase_price)
         asset_detail.used_years = asset_detail_data.get('used_years', asset_detail.used_years)
         asset_detail.last_maintenance_date = asset_detail_data.get('last_maintenance_date', asset_detail.last_maintenance_date)
         asset_detail.status = asset_detail_data.get('status', asset_detail.status)
+        asset_detail.deleted_at = asset_detail_data.get('deleted_at',asset_detail.deleted_at)
         db.session.commit()
         return asset_detail.to_dict()
     return None

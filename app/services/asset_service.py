@@ -24,6 +24,7 @@ def update_asset(asset_id, asset_data):
         asset.asset_name = asset_data.get('asset_name', asset.asset_name)
         asset.description = asset_data.get('description', asset.description)
         asset.category_id = asset_data.get('category_id', asset.category_id)
+        asset.deleted_at = asset_data.get('deleted_at', asset.deleted_at)
         db.session.commit()
         return asset.to_dict()
     return None

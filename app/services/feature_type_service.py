@@ -21,6 +21,7 @@ def update_feature_type(feature_type_id, feature_type_data):
     if feature_type:
         feature_type.name = feature_type_data.get('name', feature_type.name)
         feature_type.description = feature_type_data.get('description', feature_type.description)
+        feature_type.deleted_at = feature_type_data.get('deleted_at', feature_type.deleted_at)
         db.session.commit()
         return feature_type.to_dict()
     return None

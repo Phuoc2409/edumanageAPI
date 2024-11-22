@@ -3,7 +3,7 @@ from app.database import db
 
 def create_feature(feature_data):
     feature = Feature(
-        ordinal_number=feature_data['ordinal_number'],
+        feature_type_id=feature_data['feature_type_id'],
         description=feature_data['description']
     )
     db.session.add(feature)
@@ -19,8 +19,9 @@ def get_all_features():
 def update_feature(feature_id, feature_data):
     feature = Feature.query.get(feature_id)
     if feature:
-        feature.ordinal_number = feature_data.get('ordinal_number', feature.ordinal_number)
+        feature.feature_type_id = feature_data.get('feature_type_id', feature.feature_type_id)
         feature.description = feature_data.get('description', feature.description)
+        feature.deleted_at = feature_data.get('deleted_at', feature.deleted_at)
         db.session.commit()
         return feature.to_dict()
     return None
