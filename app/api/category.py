@@ -2,9 +2,12 @@ from flask import Blueprint, jsonify, request
 from app.services.category_service import (
     create_category,
     get_category_by_id,
-    get_all_categories,
+    filter_all_categories,
     update_category,
     delete_category,
+    get_all_categories,
+    get_all_buildings
+   
 )
 from app.utils.permisions import permission_required
 from flask_jwt_extended import jwt_required
@@ -58,3 +61,24 @@ def delete_category_api(category_id):
     if delete_category(category_id):
         return jsonify({"message": "Category deleted successfully"}), 204
     return jsonify({"error": "Category not found"}), 404
+
+@categories_bp.route("/categories/filter", methods=["POST"])
+@jwt_required()
+@permission_required('category-index')
+def filter_categories():
+    filters = request.get_json()
+    categories = filter_all_categories(
+        min_lifespan=filters.get("min_lifespan"),
+        max_lifespan=filters.get("max_lifespan"),
+        name=filters.get("name"),
+        description=filters.get("description"),
+        default_salvage_value_rate=filters.get("default_salvage_value_rate"),
+        parent_id=filters.get("parent_id"),
+        
+    )
+    return jsonify(categories), 200
+
+@categories_bp.route("/buildings", methods=["GET"])
+def get_buildings():
+    buildings = get_all_buildings()
+    return jsonify({"buildings": buildings})

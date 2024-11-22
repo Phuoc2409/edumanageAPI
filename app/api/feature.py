@@ -5,6 +5,7 @@ from app.services.feature_service import (
     get_all_features,
     update_feature,
     delete_feature,
+    filter_all_features,
 )
 from app.utils.permisions import permission_required
 from flask_jwt_extended import jwt_required
@@ -58,3 +59,17 @@ def delete_feature_api(feature_id):
     if delete_feature(feature_id):
         return jsonify({"message": "Feature deleted successfully"}), 204
     return jsonify({"error": "Feature not found"}), 404
+
+
+# Lọc tính năng theo yêu cầu
+@features_bp.route("/features/filter", methods=["POST"])
+@jwt_required()
+@permission_required('feature-index')
+def filter_features():
+    filters = request.get_json()
+    features = filter_all_features(
+        description=filters.get("description"),
+        feature_type_id=filters.get("feature_type_id"),
+        feature_type_name=filters.get("feature_type") 
+    )
+    return jsonify(features), 200

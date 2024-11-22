@@ -1,6 +1,6 @@
 from app.models.requirement_detail import RequirementDetail
 from app.database import db
-
+from app.models.requirement import Requirement
 def create_requirement_detail(requirement_detail_data):
     requirement_detail = RequirementDetail(
         asset_detail_id=requirement_detail_data['asset_detail_id'],
@@ -34,3 +34,33 @@ def delete_requirement_detail(requirement_detail_id):
         db.session.commit()
         return True
     return False
+
+
+def get_specific_requirement_detail(requirement_id):
+    # Tìm Requirement theo ID
+    requirement = Requirement.query.get(requirement_id)
+    if not requirement:
+        return None
+
+    # Lấy các chi tiết yêu cầu liên quan từ RequirementDetail
+    requirement_details = [
+        {
+            "detail_id": detail.id,
+            "asset_detail_id": detail.asset_detail_id,
+            "requirement_type": detail.requirement_type,
+            "description": detail.description
+        }
+        for detail in requirement.requirement_details  # Giả sử có quan hệ với RequirementDetail
+    ]
+
+    # Chuẩn bị dữ liệu chi tiết yêu cầu
+    data = {
+        "id": requirement.id,
+        "user_id": requirement.user_id,
+        "date": requirement.date.isoformat(),
+        "description": requirement.description,
+        "status": requirement.status,
+        "requirement_details": requirement_details
+    }
+
+    return data

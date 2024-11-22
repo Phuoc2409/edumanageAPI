@@ -5,6 +5,8 @@ from app.services.asset_service import (
     get_all_assets,
     update_asset,
     delete_asset,
+    get_floors_by_building,
+    filter_assets
 )
 from app.utils.permisions import permission_required
 from flask_jwt_extended import jwt_required
@@ -58,3 +60,29 @@ def delete_asset_api(asset_id):
     if delete_asset(asset_id):
         return jsonify({"message": "Asset deleted successfully"}), 204
     return jsonify({"error": "Asset not found"}), 404
+
+@assets_bp.route("/floors/<int:building_id>", methods=["GET"])
+def get_floors(building_id):
+    floors = get_floors_by_building(building_id)
+    if not floors:
+        return jsonify({"error": "Building not found"}), 404
+    return jsonify(floors), 200
+
+@assets_bp.route('/assets/filter', methods=['POST'])
+def get_filtered_assets():
+    # Lấy dữ liệu JSON từ body của yêu cầu
+    filters = request.get_json()
+    if filters is None:
+        return jsonify({"error": "No JSON data provided"}), 400
+    # Chuyển các tham số không phải kiểu số về chuỗi (nếu có)
+    for key, value in filters.items():
+        if isinstance(value, str):
+            continue  # Giữ nguyên chuỗi
+        elif value.isdigit():
+            filters[key] = int(value)  # Chuyển các giá trị số về kiểu int
+    # Gọi hàm filter_assets và trả về kết quả dưới dạng JSON
+    try:
+        result = filter_assets(filters)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400

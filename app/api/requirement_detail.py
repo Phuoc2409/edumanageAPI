@@ -5,6 +5,7 @@ from app.services.requirement_detail_service import (
     get_all_requirement_details,
     update_requirement_detail,
     delete_requirement_detail,
+    get_specific_requirement_detail,
 )
 from app.utils.permisions import permission_required
 from flask_jwt_extended import jwt_required
@@ -24,7 +25,7 @@ def add_requirement_detail():
 # Lấy tất cả chi tiết yêu cầu
 @requirement_details_bp.route("/requirement-details", methods=["GET"])
 @jwt_required()
-@permission_required('requirement-detail-index')
+#@permission_required('requirement-detail-index')
 def read_requirement_details():
     requirement_details = get_all_requirement_details()
     return jsonify(requirement_details), 200
@@ -58,3 +59,13 @@ def delete_requirement_detail_api(requirement_detail_id):
     if delete_requirement_detail(requirement_detail_id):
         return jsonify({"message": "Requirement detail deleted successfully"}), 204
     return jsonify({"error": "Requirement detail not found"}), 404
+
+
+requirement_details_bp.route("/requirement-details/specific-requirement-details/<int:requirement_id>", methods=["GET"])
+@jwt_required()
+#@permission_required('requirement-detail-index')
+def get_requirement_with_type_api(requirement_id):
+    requirement_data = get_specific_requirement_detail(requirement_id)
+    if not requirement_data:
+        return jsonify({"error": "Requirement not found"}), 404
+    return jsonify(requirement_data), 200

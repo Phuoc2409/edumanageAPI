@@ -12,6 +12,7 @@ class User(db.Model):
     username = db.Column(db.Text, nullable=False)  # Tên đăng nhập - Đã sửa từ LongText thành Text
     password = db.Column(db.Text, nullable=False)  # Mật khẩu - Đã sửa từ LongText thành Text
 
+
     def to_dict(self):
         return {
             'id': self.id,
@@ -20,4 +21,5 @@ class User(db.Model):
             'phonenumber': self.phonenumber,
             'username': self.username,
             'password': self.password,
+         
         }

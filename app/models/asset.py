@@ -4,15 +4,18 @@ class Asset(db.Model):
     __tablename__ = 'assets'  # Tên bảng trong cơ sở dữ liệu
 
     # Các thuộc tính của model
-    id = db.Column(db.Integer, primary_key=True)  # Khóa chính
-    asset_name = db.Column(db.Text, nullable=False)  # Tên tài sản
-    description = db.Column(db.Text, nullable=False)  # Mô tả tài sản
-    category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=False)  # Khóa ngoại đến bảng categories
-
+    __tablename__ = 'assets'
+    id = db.Column(db.Integer, primary_key=True)
+    asset_name = db.Column(db.Text, nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=False)
+    category = db.relationship('Category', backref='assets', lazy=True)
+    deleted_at = db.Column(db.Date, nullable=True)
     def to_dict(self):
         return {
             "id": self.id,
             "asset_name": self.asset_name,
             "description": self.description,
-            "category_id": self.category_id,
+            "category": self.category.name if self.category else None,
+            "deleted_at":self.deleted_at
         }

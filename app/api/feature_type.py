@@ -5,6 +5,7 @@ from app.services.feature_type_service import (
     get_all_feature_types,
     update_feature_type,
     delete_feature_type,
+    get_feature_with_type,
 )
 from app.utils.permisions import permission_required
 from flask_jwt_extended import jwt_required
@@ -58,3 +59,13 @@ def delete_feature_type_api(feature_type_id):
     if delete_feature_type(feature_type_id):
         return jsonify({"message": "Feature type deleted successfully"}), 204
     return jsonify({"error": "Feature type not found"}), 404
+
+# Lấy thông tin tất cả Features cùng với thông tin FeatureType liên quan
+@feature_types_bp.route("/feature-types/features-with-type/<int:feature_id>", methods=["GET"])
+@jwt_required()
+#@permission_required('feature-type-index')
+def get_feature_with_type_api(feature_id):
+    feature_data = get_feature_with_type(feature_id)
+    if not feature_data:
+        return jsonify({"error": "Feature not found"}), 404
+    return jsonify(feature_data), 200
