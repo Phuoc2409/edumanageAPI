@@ -11,7 +11,7 @@ class RequirementDetail(db.Model):
     deleted_at = db.Column(db.Date)
 
     def to_dict(self):
-        return {
+        return {    
             "id": self.id,
             "asset_detail_id": self.asset_detail_id,
             "requirement_type": self.requirement_type,
