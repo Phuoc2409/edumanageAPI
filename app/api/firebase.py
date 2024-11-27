@@ -21,7 +21,7 @@ def upload_data():
     except Exception as e:
         return jsonify({'error': str(e)}), 5002
 
-@firebase_bp.route('/api/update_status', methods=['PUT'])
+@firebase_bp.route('/update_status', methods=['PUT'])
 def update_status():
     try:
         data = request.get_json()
