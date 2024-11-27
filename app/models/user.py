@@ -11,7 +11,7 @@ class User(db.Model):
     phonenumber = db.Column(db.Integer, nullable=False)  # Số điện thoại
     username = db.Column(db.Text, nullable=False)  # Tên đăng nhập - Đã sửa từ LongText thành Text
     password = db.Column(db.Text, nullable=False)  # Mật khẩu - Đã sửa từ LongText thành Text
-
+    deleted_at = db.Column(db.Date)
 
     def to_dict(self):
         return {
@@ -21,5 +21,6 @@ class User(db.Model):
             'phonenumber': self.phonenumber,
             'username': self.username,
             'password': self.password,
+            'deleted_at': self.deleted_at,
          
         }

@@ -1,7 +1,10 @@
 from app.models.category import Category
+from app.models.asset import Asset
+from app.models.asset_detail import AssetDetail
 from app.database import db
 from sqlalchemy import and_
 from sqlalchemy.orm import aliased
+from sqlalchemy import func
 def create_category(category_data):
     category = Category(
         name=category_data['name'],
@@ -156,3 +159,84 @@ def get_all_buildings():
             {"id": building.id, "name": building.name, "description": building.description}
             for building in buildings
         ]
+        
+def get_category_statistics():
+    """
+    Lấy thống kê tài sản theo danh mục, trạng thái và số lượng đã bị xóa.
+    """
+    # Query để lấy tất cả danh mục
+    categories_query = db.session.query(Category.name).all()
+    categories = {category.name: {"statuses": {}, "deleted_count": 0} for category in categories_query}
+
+    # Query để lấy thống kê tài sản theo danh mục và trạng thái
+    statistics_query = (
+        db.session.query(
+            Category.name.label('category_name'),
+            AssetDetail.status.label('status'),
+            func.count(AssetDetail.id).label('count')
+        )
+        .join(Asset, Asset.id == AssetDetail.asset_id)
+        .join(Category, Category.id == Asset.category_id)
+        .filter(Asset.deleted_at.is_(None))  # Loại bỏ tài sản bị xóa khỏi thống kê chính
+        .group_by(Category.name, AssetDetail.status)
+    ).all()
+
+
+    deleted_query = (
+        db.session.query(
+            Category.name.label('category_name'),
+            func.count(Asset.id).label('deleted_count')
+        )
+        .join(Category, Category.id == Asset.category_id)
+        .filter(Asset.deleted_at.isnot(None))  # Chỉ tính tài sản bị xóa
+        .group_by(Category.name)
+    ).all()
+
+    # Xử lý dữ liệu từ query thống kê
+    for row in statistics_query:
+        category = categories.setdefault(row.category_name, {"statuses": {}, "deleted_count": 0})
+        category["statuses"][row.status] = row.count
+
+    # Xử lý dữ liệu từ query tài sản đã bị xóa
+    for row in deleted_query:
+        category = categories.setdefault(row.category_name, {"statuses": {}, "deleted_count": 0})
+        category["deleted_count"] = row.deleted_count
+
+    # Đảm bảo rằng mọi category đều có thông tin về tất cả các trạng thái và deleted_count
+    for category in categories.values():
+        if "deleted_count" not in category:
+            category["deleted_count"] = 0  # Nếu không có tài sản bị xóa thì gán giá trị là 0
+        # Đảm bảo rằng tất cả các trạng thái đều có giá trị mặc định là 0
+        for status in ["available", "in_use", "maintainance"]:  # Đây là các trạng thái ví dụ, có thể tùy chỉnh
+            if status not in category["statuses"]:
+                category["statuses"][status] = 0
+
+    return categories
+
+
+def get_purchase_statistics(start_date, end_date):
+
+    # Lấy tất cả danh mục
+    categories_query = db.session.query(Category.name).all()
+    categories = {category.name: {"total_items": 0, "total_amount": 0} for category in categories_query}
+
+    # Truy vấn số sản phẩm đã mua và tổng tiền đã chi theo danh mục trong khoảng thời gian
+    purchase_query = (
+        db.session.query(
+            Category.name.label('category_name'),
+            func.count(AssetDetail.id).label('total_items'),  # Đếm số lượng tài sản đã mua
+            func.sum(AssetDetail.purchase_price).label('total_amount')  # Tính tổng tiền đã chi
+        )
+        .join(Asset, Asset.id == AssetDetail.asset_id)
+        .join(Category, Category.id == Asset.category_id)
+        .filter(AssetDetail.purchase_date >= start_date, AssetDetail.purchase_date <= end_date)
+        .group_by(Category.name)
+    ).all()
+
+    # Cập nhật kết quả vào dictionary categories
+    for row in purchase_query:
+        category = categories.setdefault(row.category_name, {"total_items": 0, "total_amount": 0})
+        category["total_items"] = row.total_items
+        category["total_amount"] = row.total_amount
+
+    return categories

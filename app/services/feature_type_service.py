@@ -55,3 +55,22 @@ def get_feature_with_type(feature_id):
     }
     
     return feature_data
+
+def search_feature_types(search_name, search_description, search_deleted_at):
+    query = FeatureType.query
+
+    # Tìm kiếm theo tên
+    if search_name:
+        query = query.filter(FeatureType.name.ilike(f'%{search_name}%'))
+    
+    # Tìm kiếm theo mô tả
+    if search_description:
+        query = query.filter(FeatureType.description.ilike(f'%{search_description}%'))
+    
+    # Tìm kiếm theo ngày xóa
+    if search_deleted_at:
+        query = query.filter(FeatureType.deleted_at == search_deleted_at)
+
+    # Thực hiện truy vấn và trả về kết quả
+    feature_types = query.all()
+    return [feature_type.to_dict() for feature_type in feature_types]

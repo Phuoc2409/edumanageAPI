@@ -6,6 +6,7 @@ from app.services.feature_type_service import (
     update_feature_type,
     delete_feature_type,
     get_feature_with_type,
+    search_feature_types
 )
 from app.utils.permisions import permission_required
 from flask_jwt_extended import jwt_required
@@ -69,3 +70,17 @@ def get_feature_with_type_api(feature_id):
     if not feature_data:
         return jsonify({"error": "Feature not found"}), 404
     return jsonify(feature_data), 200
+
+@feature_types_bp.route("/feature-types/filter", methods=["POST"])
+@jwt_required()
+def search_feature_types_api():
+    # Lấy dữ liệu tìm kiếm từ request body
+    data = request.get_json()
+    search_name = data.get('name', None)
+    search_description = data.get('description', None)
+    search_deleted_at = data.get('deleted_at', None)
+
+    # Gọi hàm tìm kiếm từ service
+    feature_types = search_feature_types(search_name, search_description, search_deleted_at)
+    
+    return jsonify(feature_types), 200
