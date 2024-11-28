@@ -10,7 +10,7 @@ class Category(db.Model):
     max_lifespan = db.Column(db.Integer, nullable=False)
     default_salvage_value_rate = db.Column(db.Float, nullable=False)
     parent_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=True)
-
+    deleted_at = db.Colummn(db.Date)
     parent = db.relationship('Category', remote_side=[id], backref='subcategories', lazy=True)
     deleted_at = db.Column(db.Date)
 

@@ -29,6 +29,7 @@ def update_category(category_id, category_data):
         category.max_lifespan = category_data.get('max_lifespan', category.max_lifespan)
         category.default_salvage_value_rate = category_data.get('default_salvage_value_rate', category.default_salvage_value_rate)
         category.parent_id = category_data.get('parent_id', category.parent_id)
+        category.deleted_at = category_data.get('deleted_at', category.deleted_at)
         db.session.commit()
         return category.to_dict()
     return None

@@ -47,6 +47,7 @@ def update_requirement(requirement_id, data):
     requirement.date = data.get("date", requirement.date)
     requirement.description = data.get("description", requirement.description)
     requirement.status = data.get("status", requirement.status)
+    requirement.deleted_at = data.get("deleted_at", requirement.deleted_at)
 
     db.session.commit()
     return requirement.to_dict()

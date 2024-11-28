@@ -7,7 +7,7 @@ class AssetFeature(db.Model):
     asset_detail_id = db.Column(db.Integer, db.ForeignKey('asset_details.id'), nullable=False)
     feature_id = db.Column(db.Integer, db.ForeignKey('features.id'), nullable=False)
     description = db.Column(db.Text, nullable=True)
-
+    deleted_at = db.Column(db.Date)
     asset_detail = db.relationship('AssetDetail', backref='features', lazy=True)
     feature = db.relationship('Feature', backref='asset_features', lazy=True)
     deleted_at = db.Column(db.Date)

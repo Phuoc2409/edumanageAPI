@@ -23,6 +23,7 @@ def update_requirement_detail(requirement_detail_id, requirement_detail_data):
         requirement_detail.asset_detail_id = requirement_detail_data.get('asset_detail_id', requirement_detail.asset_detail_id)
         requirement_detail.requirement_type = requirement_detail_data.get('requirement_type', requirement_detail.requirement_type)
         requirement_detail.description = requirement_detail_data.get('description', requirement_detail.description)
+        requirement_detail.deleted_at = requirement_detail_data.get('deleted_at', requirement_detail.deleted_at)
         db.session.commit()
         return requirement_detail.to_dict()
     return None

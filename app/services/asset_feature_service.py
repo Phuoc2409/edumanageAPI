@@ -3,7 +3,8 @@ from app.database import db
 
 def create_asset_feature(asset_feature_data):
     asset_feature = AssetFeature(
-        asset_feature_name=asset_feature_data['asset_feature_name'],
+        asset_detaitl_id=asset_feature_data['asset_detaitl_id'],
+        feature_id=asset_feature_data['feature_id'],
         description=asset_feature_data['description']
     )
     db.session.add(asset_feature)
@@ -19,11 +20,13 @@ def get_all_asset_features():
 def update_asset_feature(asset_feature_id, asset_feature_data):
     asset_feature = AssetFeature.query.get(asset_feature_id)
     if asset_feature:
-        asset_feature.asset_feature_name = asset_feature_data.get('asset_feature_name', asset_feature.asset_feature_name)
+        asset_feature.asset_detail_id = asset_feature_data.get('asset_detaitl_id', asset_feature.asset_feature_name)
+        asset_feature.feature_id= asset_feature_data.get('feature_id', asset_feature.asset_feature_name)
         asset_feature.description = asset_feature_data.get('description', asset_feature.description)
+        asset_feature.description = asset_feature_data.get('deleted_at', asset_feature.deleted_at)
         db.session.commit()
         return asset_feature.to_dict()
-    return None
+    return None 
 
 def delete_asset_feature(asset_feature_id):
     asset_feature = AssetFeature.query.get(asset_feature_id)
