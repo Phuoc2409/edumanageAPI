@@ -12,10 +12,11 @@ def create_feature_type(feature_type_data):
     return feature_type.to_dict()
 
 def get_feature_type_by_id(feature_type_id):
-    return FeatureType.query.get(feature_type_id).to_dict() if FeatureType.query.get(feature_type_id) else None
+    feature_type = FeatureType.query.filter(FeatureType.id == feature_type_id, FeatureType.deleted_at.is_(None)).first()
+    return feature_type.to_dict() if feature_type else None
 
 def get_all_feature_types():
-    return [feature_type.to_dict() for feature_type in FeatureType.query.all()]
+    return [ft.to_dict() for ft in FeatureType.query.filter(FeatureType.deleted_at.is_(None)).all()]
 
 def update_feature_type(feature_type_id, feature_type_data):
     feature_type = FeatureType.query.get(feature_type_id)

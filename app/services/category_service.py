@@ -63,7 +63,7 @@ def get_all_categories():
         Category.default_salvage_value_rate,
         Category.parent_id,
         ParentCategory.name.label("parent_name")
-    ).all()
+    ).filter(Category.deleted_at.is_(None)).all()
 
     return [
         {
@@ -107,7 +107,7 @@ def filter_all_categories(min_lifespan=None, max_lifespan=None,
                           default_salvage_value_rate=None, parent_id=None):
     ParentCategory = aliased(Category)
     query = Category.query.outerjoin(ParentCategory, Category.parent_id == ParentCategory.id)
-
+    query = query.filter(Category.deleted_at.is_(None))
     # Áp dụng các bộ lọc
     if min_lifespan is not None:
         query = query.filter(Category.min_lifespan >= min_lifespan)
@@ -131,6 +131,7 @@ def filter_all_categories(min_lifespan=None, max_lifespan=None,
         Category.id,
         Category.name,
         Category.description,
+        Category.deleted_at,
         Category.min_lifespan,
         Category.max_lifespan,
         Category.default_salvage_value_rate,
@@ -147,7 +148,8 @@ def filter_all_categories(min_lifespan=None, max_lifespan=None,
             "max_lifespan": result.max_lifespan,
             "default_salvage_value_rate": result.default_salvage_value_rate,
             "parent_id": result.parent_id,
-            "parent_name": result.parent_name
+            "parent_name": result.parent_name,
+            "deleted_at": result.deleted_at
         }
         for result in results
     ]

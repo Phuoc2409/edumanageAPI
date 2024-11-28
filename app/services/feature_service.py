@@ -12,10 +12,12 @@ def create_feature(feature_data):
     return feature.to_dict()
 
 def get_feature_by_id(feature_id):
-    return Feature.query.get(feature_id).to_dict() if Feature.query.get(feature_id) else None
+    feature = Feature.query.filter(Feature.id == feature_id, Feature.deleted_at.is_(None)).first()
+    return feature.to_dict() if feature else None
 
 def get_all_features():
-    return [feature.to_dict() for feature in Feature.query.all()]
+    features = Feature.query.filter(Feature.deleted_at.is_(None)).all()
+    return [feature.to_dict() for feature in features]
 
 def update_feature(feature_id, feature_data):
     feature = Feature.query.get(feature_id)
@@ -38,7 +40,7 @@ def delete_feature(feature_id):
 
 def filter_all_features(description=None, feature_type_id=None,feature_type_name=None):
     query = Feature.query.join(FeatureType)
-
+    query = Feature.query.join(FeatureType).filter(Feature.deleted_at.is_(None))
     # Áp dụng bộ lọc
     if description:
         query = query.filter(Feature.description.ilike(f"%{description}%"))

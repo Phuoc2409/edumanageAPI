@@ -12,10 +12,13 @@ def create_asset(asset_data):
     return asset.to_dict()
 
 def get_asset_by_id(asset_id):
-    return Asset.query.get(asset_id).to_dict() if Asset.query.get(asset_id) else None
+    
+    asset = Asset.query.filter(Asset.id == asset_id, Asset.deleted_at.is_(None)).first()
+    return asset.to_dict() if asset else None
 
 def get_all_assets():
-    return [asset.to_dict() for asset in Asset.query.all()]
+    assets = Asset.query.filter(Asset.deleted_at.is_(None)).all()
+    return [asset.to_dict() for asset in assets]
 
 def update_asset(asset_id, asset_data):
     asset = Asset.query.get(asset_id)
@@ -52,6 +55,7 @@ def filter_assets(filters):
     Lọc và tìm kiếm trên bảng Asset dựa theo các trường và giá trị trong filters.
     """
     query = Asset.query
+    query = Asset.query.filter(Asset.deleted_at.is_(None)) 
     # Duyệt qua tất cả các trường trong filters và thêm điều kiện vào query
     for key, value in filters.items():
         if hasattr(Asset, key) and value is not None:

@@ -62,7 +62,7 @@ def user_profile():
     user = get_current_user()
     
     if user:
-        return jsonify({'username': user.username, 'email': user.gmail,'fullname':user.fullname,'phonenumber':user.phonenumber}), 200
+        return jsonify({'id':user.id,'username': user.username, 'email': user.gmail,'fullname':user.fullname,'phonenumber':user.phonenumber}), 200
     else:
         return jsonify({'message': 'User not found'}), 404
 
